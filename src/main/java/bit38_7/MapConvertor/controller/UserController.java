@@ -1,9 +1,8 @@
-package bit38_7.controller;
+package bit38_7.MapConvertor.controller;
 
 
-import bit38_7.domain.User;
-import bit38_7.service.UserService;
-import lombok.Data;
+import bit38_7.MapConvertor.domain.User;
+import bit38_7.MapConvertor.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@ResponseBody
-@RequestMapping("user-api")
 @RequiredArgsConstructor
+@RequestMapping("user-api")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("join")
-    public ResponseEntity<String> join(@RequestBody String userid, String password, String userName){
-        User user = new User(userid, password, userName);
+    @PostMapping("/join")
+    @ResponseBody
+    public ResponseEntity<String> join(@RequestBody User user){
+        System.out.println("user = " + user);
         Boolean result = userService.join(user);
 
         if (!result) {
