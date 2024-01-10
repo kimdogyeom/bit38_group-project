@@ -24,7 +24,6 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 		return hasLoginAnnotation && hasMemberType;		// 조건이 참이면 해당 리졸버로 작업 수행
 	}
 
-
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		log.info("resolveArgument 실행");

@@ -27,7 +27,7 @@ public class LoginController {
 		user.setLoginId(loginRequest.getLoginId());
 		user.setPassword(loginRequest.getPassword());
 
-		log.info("user = {}",user);
+		log.info("login userInfo = {}",user);
 
 		User loginResult = userService.login(user);
 
