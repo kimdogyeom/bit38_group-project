@@ -1,4 +1,4 @@
-package bit38_7.domain;
+package bit38_7.MapConvertor.domain.user;
 
 import lombok.Data;
 
@@ -13,6 +13,9 @@ public class User {
 	private String loginId;
 	private String password;
 	private String userName;
+
+	public User() {
+	}
 
 	public User(String loginId, String password, String userName) {
 		this.id = ++sequence;

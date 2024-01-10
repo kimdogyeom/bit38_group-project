@@ -1,9 +1,7 @@
 package serice;
 
-import bit38_7.domain.User;
-import bit38_7.repository.MemoryUserRepository;
-import bit38_7.repository.UserRepository;
-import bit38_7.service.UserService;
+import bit38_7.MapConvertor.domain.user.User;
+import bit38_7.MapConvertor.service.UserService;
 import org.junit.jupiter.api.Test;
 
 public class MemberServiceTest {
