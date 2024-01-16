@@ -13,14 +13,16 @@ public class User {
 	private String loginId;
 	private String password;
 	private String userName;
+	private String email;
 
 	public User() {
 	}
 
-	public User(String loginId, String password, String userName) {
+	public User(String loginId, String password, String userName, String email) {
 		this.id = ++sequence;
 		this.loginId = loginId;
 		this.password = password;
 		this.userName = userName;
+		this.email = email;
 	}
 }

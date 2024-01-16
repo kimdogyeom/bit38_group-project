@@ -9,9 +9,9 @@ public class MemberServiceTest {
 
     @Test
     public void join() {
-        User user = new User("kim", "12344", "dodo");
+        User user = new User("kim", "12344", "dodo", "test@test.com");
         userList.join(user);
-        User user1 = new User("kim", "12344", "dodo");
+        User user1 = new User("kim", "12344", "dodo","test@test.com");
         userList.join(user1);
 
     }

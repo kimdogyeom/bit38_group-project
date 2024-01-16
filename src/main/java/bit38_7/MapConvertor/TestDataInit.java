@@ -18,9 +18,11 @@ public class TestDataInit {
     @PostConstruct
     public void init() {
         User user = new User();
+        user.setId(1L);
         user.setLoginId("test");
         user.setPassword("test!");
         user.setUserName("테스터");
+        user.setEmail("test@test.com");
         memoryUserRepository.save(user);
     }
 

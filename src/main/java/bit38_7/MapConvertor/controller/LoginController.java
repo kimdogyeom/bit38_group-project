@@ -44,6 +44,7 @@ public class LoginController {
 		// 세션에 로그인 회원 정보 보관
 		session.setAttribute(SessionConst.LOGIN_MEMBER, loginResult);
 
+		log.info("session = {}", session.getAttribute(SessionConst.LOGIN_MEMBER));
 
 		return ResponseEntity.ok().body("로그인 성공");
 	}

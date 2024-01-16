@@ -1,20 +1,31 @@
 package bit38_7.MapConvertor.controller;
 
 
+import bit38_7.MapConvertor.domain.user.User;
+import bit38_7.MapConvertor.dto.InfoRequest;
+import bit38_7.MapConvertor.interceptor.session.SessionConst;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
 @RequiredArgsConstructor
-@RequestMapping("user-api")
+@RestController
 public class UserController {
 
+	@GetMapping("/users/info")
+	public ResponseEntity<?> userInfo(HttpServletRequest request) {
 
-	@PostMapping("/transfer")
-	public ResponseEntity transfer() {
-		return ResponseEntity.ok().body("success");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+		InfoRequest responseUser = new InfoRequest();
+		responseUser.setLoginId(user.getLoginId());
+		responseUser.setUserName(user.getUserName());
+
+		return ResponseEntity.ok().body(responseUser);
 	}
+
 }
