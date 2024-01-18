@@ -25,10 +25,18 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	runtimeOnly 'mysql:mysql-connector-java'
+
+	//JdbcTemplate 추가
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+	implementation 'mysql:mysql-connector-java:8.0.27'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	//테스트에서 lombok 사용
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 tasks.named('test') {
 	useJUnitPlatform()

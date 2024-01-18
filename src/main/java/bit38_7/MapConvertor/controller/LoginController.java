@@ -27,7 +27,7 @@ public class LoginController {
 		user.setLoginId(loginRequest.getLoginId());
 		user.setPassword(loginRequest.getPassword());
 
-		log.info("login userInfo = {}",user);
+		log.info("login userInfo = {}", user);
 
 		User loginResult = userService.login(user);
 
@@ -37,7 +37,7 @@ public class LoginController {
 		}
 
 		// 로그인 성공 처리
-		// HttpSession을 사용해서 세션처리
+		// HttpSession 사용해서 세션처리
 
 		// 세션이 있으면 있는 세션 반환, 없으면 신규 세션을 생성
 		HttpSession session = request.getSession(true);
@@ -61,5 +61,20 @@ public class LoginController {
 		}
 
 		return ResponseEntity.ok().body("로그아웃 성공 세션 없었음");
+	}
+
+	@PostMapping("/join")
+	public ResponseEntity<?> join(@RequestBody User user) {
+		log.info("join userInfo = {}", user);
+
+		User joinResult = userService.join(user);
+		log.info("joinResult = {}", joinResult);
+
+		if (joinResult == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body("회원가입 실패");
+		}
+
+		return ResponseEntity.ok().body("회원가입 성공");
 	}
 }

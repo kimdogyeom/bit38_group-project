@@ -1,40 +1,46 @@
 package bit38_7.MapConvertor.service;
 
 import bit38_7.MapConvertor.domain.user.User;
-import bit38_7.MapConvertor.repository.MemoryUserRepository;
-import bit38_7.MapConvertor.repository.UserRepository;
+import bit38_7.MapConvertor.dto.UserRequest;
+import bit38_7.MapConvertor.repository.user.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository = new MemoryUserRepository();
+    private final UserRepository userRepository;
 
     public User login(User user) {
-        return userRepository.findByLoginId(user.getLoginId())
-            .filter(m -> m.getPassword().equals(user.getPassword()))
-            .orElse(null);
+        return userRepository.findByUsernameAndPassword(user.getLoginId(), user.getPassword())
+                .orElse(null);
     }
 
 
-    public Boolean join(User user) {
-        try {
-            validateDuplicateUser(user);
-            userRepository.save(user);
-            return true;
-        } catch (IllegalStateException e) {
-            log.info("validateDuplicateUser = {}", e.getMessage());
-            return false;
-        }
+    public User join(User user) {
+        User save = userRepository.save(user);
+        return save;
     }
 
-    private void validateDuplicateUser(User user) {
-        userRepository.findUserName(user.getLoginId())
-                .ifPresent(m -> {
-                    throw new IllegalStateException("이미 존재하는 회원입니다.");
-                });
+    public String findId(UserRequest findRequest) {
+        String userId = userRepository.findUserId(findRequest);
+        return userId;
     }
+
+    public String findPw(UserRequest findRequest) {
+        String userPw = userRepository.findUserPw(findRequest);
+        return userPw;
+    }
+
+
+//    private void validateDuplicateUser(User user) {
+//        userRepository.findUserId(user.getLoginId())
+//                .ifPresent(m -> {
+//                    throw new IllegalStateException("이미 존재하는 회원입니다.");
+//                });
+//    }
 
 }
