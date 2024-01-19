@@ -11,5 +11,5 @@ public interface UserRepository {
     String findUserId(UserRequest findRequest);
 	String findUserPw(UserRequest findRequest);
 
-	Optional<User> findByUsernameAndPassword(String username, String password);
+	Optional<User> login(String username, String password);
 }

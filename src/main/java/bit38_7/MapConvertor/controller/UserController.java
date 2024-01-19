@@ -23,19 +23,19 @@ public class UserController {
 
 	private final UserService userService;
 
+
 	/**
-	 * 유저 정보
-	 *
+	 * 유저 정보 조회
 	 * @return loginId, userName
 	 */
 	@GetMapping("/users/info")
-
 	public ResponseEntity<?> userInfo(HttpServletRequest request) {
 
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
 		InfoRequest responseUser = new InfoRequest();
+
 		responseUser.setLoginId(user.getLoginId());
 		responseUser.setUserName(user.getUserName());
 
@@ -44,14 +44,12 @@ public class UserController {
 
 	/**
 	 * 아이디찾기
-	 *
 	 * @param userName
 	 * @param email
 	 * @return loginId
 	 */
 	@GetMapping("/users/id")
-	public ResponseEntity<?> userId(@RequestParam("userName") String userName,
-		@RequestParam("email") String email) {
+	public ResponseEntity<?> userId(@RequestParam("userName") String userName, @RequestParam("email") String email) {
 
 		log.info("userName = {}, email = {} ", userName, email);
 
@@ -60,7 +58,7 @@ public class UserController {
 		userRequest.setEmail(email);
 
 		String loginId = userService.findId(userRequest);
-		log.info("loginId 확인={}", loginId);
+		log.info("아이디찾기 결과={}", loginId);
 
 		if (loginId == null) {
 			return ResponseEntity.badRequest().body("해당하는 유저가 없습니다.");
@@ -89,7 +87,7 @@ public class UserController {
 		userRequest.setEmail(email);
 
 		String password = userService.findPw(userRequest);
-		log.info("password 확인={}", password);
+		log.info("비밀번호 찾기결과={}", password);
 
 		if (password == null) {
 			return ResponseEntity.badRequest().body("해당하는 유저가 없습니다.");

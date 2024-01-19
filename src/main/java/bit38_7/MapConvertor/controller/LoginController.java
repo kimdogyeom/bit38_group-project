@@ -27,7 +27,7 @@ public class LoginController {
 		user.setLoginId(loginRequest.getLoginId());
 		user.setPassword(loginRequest.getPassword());
 
-		log.info("login userInfo = {}", user);
+		log.info("로그인 요청 정보={}", user);
 
 		User loginResult = userService.login(user);
 
@@ -56,19 +56,22 @@ public class LoginController {
 
 		if (session != null) {
 			session.invalidate();
-			return ResponseEntity.ok().body("로그아웃 성공 세션삭제");
+			return ResponseEntity.ok().body("로그아웃");
 
 		}
-
-		return ResponseEntity.ok().body("로그아웃 성공 세션 없었음");
+		return ResponseEntity.ok().body("로그아웃");
 	}
 
+
+
+	//TODO
+	// 회원가입 valid달아서 검증처리 추가 + 코드 구조 다시 생각해보기
 	@PostMapping("/join")
 	public ResponseEntity<?> join(@RequestBody User user) {
-		log.info("join userInfo = {}", user);
+		log.info("회원가입 요청 정보={}", user);
 
 		User joinResult = userService.join(user);
-		log.info("joinResult = {}", joinResult);
+		log.info("회원가입 결과 정보={}", joinResult);
 
 		if (joinResult == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
