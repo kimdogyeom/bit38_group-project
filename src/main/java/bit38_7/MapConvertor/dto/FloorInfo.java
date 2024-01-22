@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class FloorInfo {
-
 	int floorNum;
 	LocalDate updateDate;
-
 }
