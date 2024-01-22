@@ -47,7 +47,7 @@ public class JdbcFileRepository implements FileRepository {
 
 	@Override
 	public void saveFloor(int buildingId, int floorNum, byte[] floorData) {
-		String sql = "insert into floor_table(building_id, floor_num, floor_file_data, update_date) values(:buildingId, :floorNum, :floorData, now())";
+		String sql = "insert into floor_table(building_id, floor_num, floor_file_data, update_date) values(:buildingId, :floorNum, :floorData, CURRENT_DATE())";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("buildingId", buildingId);
@@ -64,7 +64,7 @@ public class JdbcFileRepository implements FileRepository {
 
 	@Override
 	public List<BuildingResponse> userBuildingList(Long userId) {
-		String sql = "select building_id, building_name, building_facade, building_floor from building_table where fk_user_id = :userId";
+		String sql = "select building_id, building_name, building_floor from building_table where fk_user_id = :userId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("userId", userId);
@@ -92,7 +92,7 @@ public class JdbcFileRepository implements FileRepository {
 
 	@Override
 	public List<FloorInfo> findFloorList(int buildingId) {
-		String sql = "select floor_num, floor_file_data from floor_table where building_id = :buildingId";
+		String sql = "select floor_num, floor_file_data, update_date from floor_table where building_id = :buildingId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("buildingId", buildingId);

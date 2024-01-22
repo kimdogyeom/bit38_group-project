@@ -9,5 +9,5 @@ public class BuildingResponse {
 
 	int buildingId;
 	String buildingName;
-	int buildingCount;
+	int buildingFloor;
 }

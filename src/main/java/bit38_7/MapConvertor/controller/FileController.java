@@ -89,6 +89,8 @@ public class FileController {
 	public ResponseEntity<?> floorList(@PathVariable("buildingId") int buildingId) {
 
 		List<FloorInfo> floorList = fileService.floorList(buildingId);
+		log.info("floorList = {}", floorList);
+
 		return ResponseEntity.ok().body(floorList);
 	}
 
@@ -109,11 +111,11 @@ public class FileController {
 	 * 층 선택시 파일 다운로드
 	 * @return 층 모델파일
 	 */
-	@GetMapping("file/{buildingId}/{floorId}")
+	@GetMapping("file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> floorDownload(@PathVariable("buildingId") int buildingId,
-											@PathVariable("floorId") int floorId) {
+											@PathVariable("floorNum") int floorNum) {
 
-		byte[] floor = fileService.floorDownload(buildingId, floorId);
+		byte[] floor = fileService.floorDownload(buildingId, floorNum);
 
 		return ResponseEntity.ok().body(floor);
 	}
