@@ -10,10 +10,10 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @Valid
+@RequiredArgsConstructor
 public class UserRequest {
 	private String loginId;
 	private String password;
 	private String userName;
 	private String email;
-
 }

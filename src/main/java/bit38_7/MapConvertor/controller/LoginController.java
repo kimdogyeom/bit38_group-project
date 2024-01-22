@@ -8,6 +8,9 @@ import bit38_7.MapConvertor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -94,7 +97,7 @@ public class LoginController {
 //	}
 
 	@PostMapping("/join")
-	public ResponseEntity<Map<String, String>> registerUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errors = new HashMap<>();
 			for (FieldError error : bindingResult.getFieldErrors()) {
