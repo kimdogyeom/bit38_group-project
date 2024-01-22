@@ -46,16 +46,16 @@ public class FileController {
 
 		HttpSession session = request.getSession(false);
 		// 세션에 로그인 회원 정보 보관
-			User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
-			int userId = user.getUserId().intValue();
-		//	int userId = 1;
+//		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
+//		int userId = user.getUserId().intValue();
+		int userId = 1;
 
-//		int buildingId = fileService.buildingSave(userId, buildingInfo, file.getBytes());
-//		log.info("buildingId = {}", buildingId);
-//
-//		for (MultipartFile floor : floors) {
-//			fileService.floorSave(buildingId, floor.getBytes());
-//		}
+		int buildingId = fileService.buildingSave(userId, buildingInfo, file.getBytes());
+		log.info("buildingId = {}", buildingId);
+
+		for (MultipartFile floor : floors) {
+			fileService.floorSave(buildingId, floor.getBytes());
+		}
 
 		return ResponseEntity.ok().body("저장 성공");
 	}
