@@ -2,6 +2,7 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.BuildingInfo;
+import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorFileInfo;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
@@ -28,26 +29,18 @@ public class FileController {
 
 	private final FileService fileService;
 
-//	@PostMapping("/file/save")
-	public ResponseEntity<?> test(){
-		return ResponseEntity.ok().body("저장 성공");
-	}
-
-
-	/**
-	 * @RequestPart만 있을 때 ResourceHttpRequestHandler로 처리가 된다 왜?????
-	 */
-	@PostMapping("test/save")
-	public ResponseEntity<?> fileSave(@RequestPart("buildingInfo") String object,
-										@RequestPart("building") MultipartFile file,
-										@RequestPart("floor") List<MultipartFile> floors,
-										HttpServletRequest request) throws IOException {
+	// "file" post로 받게 만들기
+	// REST API 따르게 만들기
+	@PostMapping("file/save")
+	public ResponseEntity<?> fileSave(@RequestParam("userId") int userId,
+									@RequestPart("buildingInfo") String object,
+									@RequestPart("building") MultipartFile file,
+									@RequestPart("floor") List<MultipartFile> floors) throws IOException {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		BuildingInfo buildingInfo = objectMapper.readValue(object, BuildingInfo.class);
 		log.info("buildingInfo = {}", buildingInfo);
 
-		HttpSession session = request.getSession(false);
 		// 세션에 로그인 회원 정보 보관
 //		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
 //		int userId = user.getUserId().intValue();
@@ -64,9 +57,44 @@ public class FileController {
 		return ResponseEntity.ok().body("저장 성공");
 	}
 
+	/**
+	 * 건물 리스트 조회
+	 * userId를 직접 받는게 아니라 세션값에서 꺼내서 쓸것임
+	 * @return 유저가 생성한 건물 리스트
+	 * 여기서 건물 - 층 까지 넘겨주면 어떨까?
+	 * 굳이 2번 요청을 보낼 필요가 있나?
+	 *
+	 * 이거는 건물만 보내는 방법
+	 */
+	@GetMapping("file/list")
+	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
+
+		HttpSession session = request.getSession(false);
+		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
+		Long userId = user.getUserId();
+
+		List<BuildingResponse> buildingList = fileService.buildingList(userId);
+		log.info("buildingList = {}", buildingList);
+
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		FloorFileInfo floorFileInfo = objectMapper.readValue(object, FloorFileInfo.class);
+		log.info("floorInfo = {}",floorFileInfo);
+
+		fileService.floorUpData(floorFileInfo.getFloorNum(), floorFileInfo.getUpdateDate());
+
+		return ResponseEntity.ok().body("수정 성공");
+	}
+
+	@PostMapping("floorDelete")
+	public  ResponseEntity<?> deleteFloor(@RequestPart("floorNum")int floorNum) {
+		fileService.floorDelete(floorNum);
+		return ResponseEntity.ok().body("삭제 성공");
+	}
+
 	@PostMapping("floorUpDate")
 	public ResponseEntity<?> upDateFloor(@RequestPart("floorFileInfo")String object)
-			throws JsonProcessingException {
+		throws JsonProcessingException {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		FloorFileInfo floorFileInfo = objectMapper.readValue(object, FloorFileInfo.class);
