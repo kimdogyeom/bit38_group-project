@@ -1,18 +1,16 @@
-package bit38_7.domain;
+package bit38_7.MapConvertor.dto;
 
+
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-
 @Data
+@Valid
 @RequiredArgsConstructor
-public class User {
-
-
-	// 서버에 저장되는 유저id
-	private Long id;
-
+public class UserRequest {
 	private String loginId;
 	private String password;
 	private String userName;
+	private String email;
 }
