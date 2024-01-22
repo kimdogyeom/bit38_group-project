@@ -59,7 +59,7 @@ public class FileController {
 
 	/**
 	 * 건물 리스트 조회
-	 * @param userId userId를 직접 받는게 아니라 세션값에서 꺼내서 쓸것임
+	 * userId를 직접 받는게 아니라 세션값에서 꺼내서 쓸것임
 	 * @return 유저가 생성한 건물 리스트
 	 *
 	 * 여기서 건물 - 층 까지 넘겨주면 어떨까?
