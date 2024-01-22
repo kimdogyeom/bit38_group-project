@@ -38,6 +38,20 @@ public class FileService {
 		jdbcFileRepository.saveFloor(buildingId, floorNum, floorData);
 	}
 
+	/*
+	* 층 정보 수정
+	* @param floorNum 층 번호
+	* @param floorData 층 데이터
+	*/
+	public void floorUpData(int floorNum,byte floorData) {
+		jdbcFileRepository.upDateFloor(floorNum,floorData);
+	}
+
+	public void floorDelete(int floorNum) {
+		jdbcFileRepository.deleteFloor(floorNum);
+	}
+
+
 
 	/**
 	 * 건물 리스트 조회

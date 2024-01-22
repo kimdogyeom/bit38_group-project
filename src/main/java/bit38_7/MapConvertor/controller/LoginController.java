@@ -6,10 +6,16 @@ import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,7 +73,15 @@ public class LoginController {
 	//TODO
 	// 회원가입 valid달아서 검증처리 추가 + 코드 구조 다시 생각해보기
 	@PostMapping("/join")
-	public ResponseEntity<?> join(@RequestBody User user) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			Map<String, String> errors = new HashMap<>();
+			for (FieldError error : bindingResult.getFieldErrors()) {
+				errors.put(error.getField(), error.getDefaultMessage());
+			}
+			return ResponseEntity.badRequest().body(errors);
+		}
+
 		log.info("회원가입 요청 정보={}", user);
 
 		User joinResult = userService.join(user);
@@ -75,9 +89,10 @@ public class LoginController {
 
 		if (joinResult == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body("회원가입 실패");
+					.body(Collections.singletonMap("결과", "회원가입 실패"));
 		}
 
-		return ResponseEntity.ok().body("회원가입 성공");
+
+		return ResponseEntity.ok(Collections.singletonMap("결과", "회원가입 성공"));
 	}
 }

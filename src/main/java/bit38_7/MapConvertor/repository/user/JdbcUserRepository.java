@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JdbcUserRepository implements UserRepository {
 
+
 	private final NamedParameterJdbcTemplate template;
 	public JdbcUserRepository(DataSource dataSource) {
 		this.template = new NamedParameterJdbcTemplate(dataSource);
