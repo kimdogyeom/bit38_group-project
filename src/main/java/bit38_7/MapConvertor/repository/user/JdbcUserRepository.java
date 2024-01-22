@@ -23,14 +23,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JdbcUserRepository implements UserRepository {
 
+
 	private final NamedParameterJdbcTemplate template;
-	public JdbcUserRepository(DataSource dataSource) {
+	public JdbcUserRepository( DataSource dataSource) {
 		this.template = new NamedParameterJdbcTemplate(dataSource);
 	}
 
 	@Override
 	public User save(User user) {
-		String sql = "insert into users(login_id, user_name, password, email) values(:loginId, :userName, :password, :email)";
+		String sql = "insert into USERS(login_id, user_name, password, email) values(:loginId, :userName, :password, :email)";
 
 		try {
 			SqlParameterSource param = new BeanPropertySqlParameterSource(user);

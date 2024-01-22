@@ -120,6 +120,35 @@ public class JdbcFileRepository implements FileRepository {
 		}
 	}
 
+	@Override
+	public void upDateFloor(int floorNum, byte floorData) {
+		String sql = "update floor_table set floor_file_data =:floorData where floorNum = :floorNum";
+
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("floor_file_data", floorData);
+			params.addValue("floorNum", floorNum);
+
+			template.update(sql, params);
+		} catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+		}
+	}
+
+	@Override
+	public void deleteFloor(int floorNum) {
+		String sql = "delete from floor_table where floor_num = :floorNum";
+
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("floor_num", floorNum);
+			template.update(sql, params);
+		}catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+		}
+	}
+
+
 	private RowMapper<FloorInfo> floorRowMapper() {
 		return BeanPropertyRowMapper.newInstance(FloorInfo.class);
 	}
