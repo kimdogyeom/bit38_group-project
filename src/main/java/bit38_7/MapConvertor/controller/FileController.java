@@ -2,8 +2,10 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.BuildingInfo;
+import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -53,10 +55,25 @@ public class FileController {
 		int buildingId = fileService.buildingSave(userId, buildingInfo, file.getBytes());
 		log.info("buildingId = {}", buildingId);
 
+		// 오류가 났던 부분 오류시 확인!
 		for (MultipartFile floor : floors) {
-			fileService.floorSave(buildingId, floor.getBytes());
+			fileService.floorSave(buildingId,buildingInfo.getBuildingCount(),floor.getBytes());
 		}
 
 		return ResponseEntity.ok().body("저장 성공");
+	}
+
+	@PostMapping("floorUpDate")
+	public ResponseEntity<?> upDateFloor(@RequestPart("FloorInfo")String object)
+			throws JsonProcessingException {
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		FloorInfo floorInfo = objectMapper.readValue(object, FloorInfo.class);
+		log.info("floorInfo = {}",floorInfo);
+
+
+
+
+		return ResponseEntity.ok().body("수정 성공");
 	}
 }

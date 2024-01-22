@@ -120,6 +120,12 @@ public class JdbcFileRepository implements FileRepository {
 		}
 	}
 
+	@Override
+	public void upDateFloor(int floorNum, byte floorData) {
+		String sql = "update floor_table set floor_file_data =:floorData where floorNum = :foorNum";
+	}
+
+
 	private RowMapper<FloorInfo> floorRowMapper() {
 		return BeanPropertyRowMapper.newInstance(FloorInfo.class);
 	}
