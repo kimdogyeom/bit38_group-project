@@ -2,6 +2,7 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.BuildingInfo;
+import bit38_7.MapConvertor.dto.FloorFileInfo;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
@@ -50,30 +51,35 @@ public class FileController {
 		// 세션에 로그인 회원 정보 보관
 //		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
 //		int userId = user.getUserId().intValue();
-		int userId = 1;
+		int floorNum = 1;
 
-		int buildingId = fileService.buildingSave(userId, buildingInfo, file.getBytes());
+		int buildingId = fileService.buildingSave(floorNum, buildingInfo, file.getBytes());
 		log.info("buildingId = {}", buildingId);
 
 		// 오류가 났던 부분 오류시 확인!
 		for (MultipartFile floor : floors) {
-			fileService.floorSave(buildingId,buildingInfo.getBuildingCount(),floor.getBytes());
+			fileService.floorSave(buildingId,floorNum++,floor.getBytes());
 		}
 
 		return ResponseEntity.ok().body("저장 성공");
 	}
 
 	@PostMapping("floorUpDate")
-	public ResponseEntity<?> upDateFloor(@RequestPart("FloorInfo")String object)
+	public ResponseEntity<?> upDateFloor(@RequestPart("floorFileInfo")String object)
 			throws JsonProcessingException {
 
 		ObjectMapper objectMapper = new ObjectMapper();
-		FloorInfo floorInfo = objectMapper.readValue(object, FloorInfo.class);
-		log.info("floorInfo = {}",floorInfo);
+		FloorFileInfo floorFileInfo = objectMapper.readValue(object, FloorFileInfo.class);
+		log.info("floorInfo = {}",floorFileInfo);
 
-
-
+		fileService.floorUpData(floorFileInfo.getFloorNum(), floorFileInfo.getUpdateDate());
 
 		return ResponseEntity.ok().body("수정 성공");
+	}
+
+	@PostMapping("floorDelete")
+	public  ResponseEntity<?> deleteFloor(@RequestPart("floorNum")int floorNum) {
+		fileService.floorDelete(floorNum);
+		return ResponseEntity.ok().body("삭제 성공");
 	}
 }

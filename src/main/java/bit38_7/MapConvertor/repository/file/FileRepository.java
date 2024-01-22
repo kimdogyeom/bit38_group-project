@@ -21,4 +21,6 @@ public interface FileRepository {
 
 	void upDateFloor(int floorNum, byte floorData);
 
+	void deleteFloor(int floorNum);
+
 }
