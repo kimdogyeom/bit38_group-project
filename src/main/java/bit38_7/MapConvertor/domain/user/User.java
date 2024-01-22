@@ -14,6 +14,7 @@ public class User {
 	// 서버에 저장되는 유저id
 	private Long userId;
 
+
 	@NotBlank(message = "아이디를 입력 해주세요")
 	@Size(min = 3, message = "아이디 는 3자 이상")
 	private String loginId;
