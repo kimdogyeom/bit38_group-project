@@ -50,11 +50,11 @@ public class JdbcUserRepository implements UserRepository {
 	}
 
 	@Override
-	public Optional<User> findByUsernameAndPassword(String username, String password) {
-		String sql = "select * from users where user_name = :username and password = :password";
+	public Optional<User> login(String loginId, String password) {
+		String sql = "select * from users where login_id = :loginId and password = :password";
 		try {
 			Map<String, Object> params = new HashMap<>();
-			params.put("username", username);
+			params.put("loginId", loginId);
 			params.put("password", password);
 			User user = template.queryForObject(sql, params, userRowMapper());
 			return Optional.of(user);

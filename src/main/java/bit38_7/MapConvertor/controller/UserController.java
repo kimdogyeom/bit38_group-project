@@ -6,6 +6,10 @@ import bit38_7.MapConvertor.dto.InfoRequest;
 import bit38_7.MapConvertor.dto.UserRequest;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -19,39 +23,44 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Api(tags = "유저 계정과 관련된 API를 제공")
 public class UserController {
 
 	private final UserService userService;
 
+
 	/**
-	 * 유저 정보
-	 *
+	 * 유저 정보 조회
 	 * @return loginId, userName
 	 */
+	@Operation(summary = "유저 정보 조회")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "400", description = "실패")
+	})
 	@GetMapping("/users/info")
-
 	public ResponseEntity<?> userInfo(HttpServletRequest request) {
 
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
 		InfoRequest responseUser = new InfoRequest();
+
 		responseUser.setLoginId(user.getLoginId());
 		responseUser.setUserName(user.getUserName());
 
 		return ResponseEntity.ok().body(responseUser);
 	}
 
+
 	/**
 	 * 아이디찾기
-	 *
 	 * @param userName
 	 * @param email
 	 * @return loginId
 	 */
 	@GetMapping("/users/id")
-	public ResponseEntity<?> userId(@RequestParam("userName") String userName,
-		@RequestParam("email") String email) {
+	public ResponseEntity<?> userId(@RequestParam("userName") String userName, @RequestParam("email") String email) {
 
 		log.info("userName = {}, email = {} ", userName, email);
 
@@ -60,7 +69,7 @@ public class UserController {
 		userRequest.setEmail(email);
 
 		String loginId = userService.findId(userRequest);
-		log.info("loginId 확인={}", loginId);
+		log.info("아이디찾기 결과={}", loginId);
 
 		if (loginId == null) {
 			return ResponseEntity.badRequest().body("해당하는 유저가 없습니다.");
@@ -89,13 +98,26 @@ public class UserController {
 		userRequest.setEmail(email);
 
 		String password = userService.findPw(userRequest);
-		log.info("password 확인={}", password);
+		log.info("비밀번호 찾기결과={}", password);
 
 		if (password == null) {
 			return ResponseEntity.badRequest().body("해당하는 유저가 없습니다.");
 		}
 
 		return ResponseEntity.ok().body(password);
+	}
+
+	@GetMapping("/users/session")
+	public ResponseEntity<?> userSession(HttpServletRequest request) {
+
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+		if (user == null) {
+			return ResponseEntity.badRequest().body("세션이 없습니다.");
+		}
+
+		return ResponseEntity.ok().body(user.getUserId());
 	}
 
 }

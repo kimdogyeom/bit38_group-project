@@ -25,13 +25,13 @@ public class WebConfig implements WebMvcConfigurer{
 	}
 
 
-	/**
-	 * 로그인한 사용자 정보를 HandlerMethodArgumentResolver 에서 사용할 수 있도록 설정
-	 */
-	@Override
-	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		resolvers.add(new LoginMemberArgumentResolver());
-	}
+//	/**
+//	 * 로그인한 사용자 정보를 HandlerMethodArgumentResolver 에서 사용할 수 있도록 설정
+//	 */
+//	@Override
+//	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+//		resolvers.add(new LoginMemberArgumentResolver());
+//	}
 
 
 	/**
@@ -47,7 +47,7 @@ public class WebConfig implements WebMvcConfigurer{
 		registry.addInterceptor(new LoginCheckInterceptor())
 			.order(2)
 			.addPathPatterns("/**")
-			.excludePathPatterns("/test","/join", "/users/id","/users/pw", "/login", "/logout", "/error", "/*.png");
+			.excludePathPatterns("/swagger-ui/**","/file/save", "/users/id","/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");
 	}
 
 }

@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class InfoRequest {
-	private String loginId;
-	private String userName;
+public class BuildingResponse {
+
+	int buildingId;
+	String buildingName;
+	int buildingFloor;
 }
