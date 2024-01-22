@@ -29,7 +29,8 @@ dependencies {
 	//JdbcTemplate 추가
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
-	implementation 'mysql:mysql-connector-java:8.0.27'
+//	implementation 'mysql:mysql-connector-java:8.0.27'
+	runtimeOnly 'com.h2database:h2'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
