@@ -43,7 +43,7 @@ public class FileService {
 	 * 건물 리스트 조회
 	 * @param userId 유저아이디
 	 */
-	public List<BuildingResponse> buildingList(int userId) {
+	public List<BuildingResponse> buildingList(Long userId) {
 		return jdbcFileRepository.userBuildingList(userId);
 	}
 

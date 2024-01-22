@@ -11,7 +11,7 @@ public interface FileRepository {
 
 	void saveFloor(int buildingId, int floorNum, byte[] floorData);
 
-	List<BuildingResponse> userBuildingList(int userId);
+	List<BuildingResponse> userBuildingList(Long userId);
 
 	byte[] findBuildingFile(int buildingId);
 

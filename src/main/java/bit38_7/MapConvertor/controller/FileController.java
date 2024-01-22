@@ -1,20 +1,21 @@
 package bit38_7.MapConvertor.controller;
 
+import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.BuildingInfo;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
+import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -67,9 +68,14 @@ public class FileController {
 	 * 이거는 건물만 보내는 방법
 	 */
 	@GetMapping("file/list")
-	public ResponseEntity<?> BuildingList(@RequestParam("userId") int userId) {
+	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
+
+		HttpSession session = request.getSession(false);
+		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
+		Long userId = user.getUserId();
 
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
+		log.info("buildingList = {}", buildingList);
 
 		return ResponseEntity.ok().body(buildingList);
 	}
@@ -79,8 +85,8 @@ public class FileController {
 	 * @param buildingId
 	 * @return 층 리스트
 	 */
-	@GetMapping("file/${buildingId}/list")
-	public ResponseEntity<?> floorList(@RequestParam("buildingId") int buildingId) {
+	@GetMapping("file/{buildingId}/list")
+	public ResponseEntity<?> floorList(@PathVariable("buildingId") int buildingId) {
 
 		List<FloorInfo> floorList = fileService.floorList(buildingId);
 		return ResponseEntity.ok().body(floorList);
@@ -91,8 +97,8 @@ public class FileController {
 	 * 건물 선택시 파일 다운로드
 	 * @return 건물 모델파일
 	 */
-	@GetMapping("file/${buildingId}")
-	public ResponseEntity<?> buildingDownload(@RequestParam("buildingId") int buildingId) {
+	@GetMapping("file/{buildingId}")
+	public ResponseEntity<?> buildingDownload(@PathVariable("buildingId") int buildingId) {
 
 		byte[] buildingData = fileService.buildingDownload(buildingId);
 
@@ -103,11 +109,11 @@ public class FileController {
 	 * 층 선택시 파일 다운로드
 	 * @return 층 모델파일
 	 */
-	@GetMapping("file/${buildingId}/${floorId}")
-	public ResponseEntity<?> floorDownload(@RequestParam("buildingId") int buildingId,
-											@RequestParam("floorNum") int floorNum) {
+	@GetMapping("file/{buildingId}/{floorId}")
+	public ResponseEntity<?> floorDownload(@PathVariable("buildingId") int buildingId,
+											@PathVariable("floorId") int floorId) {
 
-		byte[] floor = fileService.floorDownload(buildingId, floorNum);
+		byte[] floor = fileService.floorDownload(buildingId, floorId);
 
 		return ResponseEntity.ok().body(floor);
 	}
