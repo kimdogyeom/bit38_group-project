@@ -16,8 +16,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -39,19 +37,21 @@ public class FileController {
 									@RequestPart("building") MultipartFile file,
 									@RequestPart("floor") List<MultipartFile> floors) throws IOException {
 
-		// 이거 service단으로 빼서 처리하기
 		ObjectMapper objectMapper = new ObjectMapper();
 		BuildingInfo buildingInfo = objectMapper.readValue(object, BuildingInfo.class);
 		log.info("buildingInfo = {}", buildingInfo);
 
 		// 세션에 로그인 회원 정보 보관
-		int buildingId = fileService.buildingSave(userId, buildingInfo, file.getBytes());
+//		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
+//		int userId = user.getUserId().intValue();
+		int floorNum = 1;
+
+		int buildingId = fileService.buildingSave(floorNum, buildingInfo, file.getBytes());
 		log.info("buildingId = {}", buildingId);
 
-
-		int floorNum = 1;
+		// 오류가 났던 부분 오류시 확인!
 		for (MultipartFile floor : floors) {
-			fileService.floorSave(buildingId, floorNum++, floor.getBytes());
+			fileService.floorSave(buildingId,floorNum++,floor.getBytes());
 		}
 
 		return ResponseEntity.ok().body("저장 성공");
@@ -76,47 +76,20 @@ public class FileController {
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
 		log.info("buildingList = {}", buildingList);
 
-		return ResponseEntity.ok().body(buildingList);
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		FloorFileInfo floorFileInfo = objectMapper.readValue(object, FloorFileInfo.class);
+		log.info("floorInfo = {}",floorFileInfo);
+
+		fileService.floorUpData(floorFileInfo.getFloorNum(), floorFileInfo.getUpdateDate());
+
+		return ResponseEntity.ok().body("수정 성공");
 	}
 
-	/**
-	 *  건물정보 조회
-	 * @param buildingId
-	 * @return 층 리스트
-	 */
-	@GetMapping("file/{buildingId}/list")
-	public ResponseEntity<?> floorList(@PathVariable("buildingId") int buildingId) {
-
-		List<FloorInfo> floorList = fileService.floorList(buildingId);
-		log.info("floorList = {}", floorList);
-
-		return ResponseEntity.ok().body(floorList);
-	}
-
-
-	/**
-	 * 건물 선택시 파일 다운로드
-	 * @return 건물 모델파일
-	 */
-	@GetMapping("file/{buildingId}")
-	public ResponseEntity<?> buildingDownload(@PathVariable("buildingId") int buildingId) {
-
-		byte[] buildingData = fileService.buildingDownload(buildingId);
-
-		return ResponseEntity.ok().body(buildingData);
-	}
-
-	/**
-	 * 층 선택시 파일 다운로드
-	 * @return 층 모델파일
-	 */
-	@GetMapping("file/{buildingId}/{floorNum}")
-	public ResponseEntity<?> floorDownload(@PathVariable("buildingId") int buildingId,
-											@PathVariable("floorNum") int floorNum) {
-
-		byte[] floor = fileService.floorDownload(buildingId, floorNum);
-
-		return ResponseEntity.ok().body(floor);
+	@PostMapping("floorDelete")
+	public  ResponseEntity<?> deleteFloor(@RequestPart("floorNum")int floorNum) {
+		fileService.floorDelete(floorNum);
+		return ResponseEntity.ok().body("삭제 성공");
 	}
 
 	@PostMapping("floorUpDate")
