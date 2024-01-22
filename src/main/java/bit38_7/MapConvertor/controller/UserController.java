@@ -42,6 +42,7 @@ public class UserController {
 		return ResponseEntity.ok().body(responseUser);
 	}
 
+
 	/**
 	 * 아이디찾기
 	 * @param userName
@@ -94,6 +95,19 @@ public class UserController {
 		}
 
 		return ResponseEntity.ok().body(password);
+	}
+
+	@GetMapping("/users/session")
+	public ResponseEntity<?> userSession(HttpServletRequest request) {
+
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+		if (user == null) {
+			return ResponseEntity.badRequest().body("세션이 없습니다.");
+		}
+
+		return ResponseEntity.ok().body(user.getUserId());
 	}
 
 }
