@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class FloorFileInfo {
+
     int floorNum;
-    byte updateDate;
+    byte[] updateFloor;
 }

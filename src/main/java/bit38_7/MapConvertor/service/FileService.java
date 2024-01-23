@@ -43,12 +43,12 @@ public class FileService {
 	* @param floorNum 층 번호
 	* @param floorData 층 데이터
 	*/
-	public void floorUpData(int floorNum,byte floorData) {
-		jdbcFileRepository.upDateFloor(floorNum,floorData);
+	public void floorUpData(int buildingId,int floorNum,byte[] floorData) {
+		jdbcFileRepository.upDateFloor(buildingId,floorNum,floorData);
 	}
 
-	public void floorDelete(int floorNum) {
-		jdbcFileRepository.deleteFloor(floorNum);
+	public void floorDelete(int buildingId,int floorNum) {
+		jdbcFileRepository.deleteFloor(buildingId,floorNum);
 	}
 
 
