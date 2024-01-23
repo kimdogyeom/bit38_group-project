@@ -47,8 +47,8 @@ public class FileService {
 		jdbcFileRepository.upDateFloor(buildingId,floorNum,floorData);
 	}
 
-	public void floorDelete(int buildingId,int floorNum,byte[] floorDeleteData) {
-		jdbcFileRepository.deleteFloor(buildingId,floorNum,floorDeleteData);
+	public void floorDelete(int buildingId,int floorNum) {
+		jdbcFileRepository.deleteFloor(buildingId,floorNum);
 	}
 
 

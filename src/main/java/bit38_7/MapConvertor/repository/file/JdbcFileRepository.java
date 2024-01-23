@@ -140,7 +140,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void deleteFloor(int buildingId,int floorNum,byte[] floorDeleteData) {
+	public void deleteFloor(int buildingId,int floorNum) {
 		String sql = "update floor_table set floor_file_data =:floorDeleteData where building_id = :buildingId and floor_num = :floorNum";
 
 		try {

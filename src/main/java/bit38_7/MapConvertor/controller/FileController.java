@@ -76,13 +76,10 @@ public class FileController {
 		return ResponseEntity.ok().body("수정 성공");
 	}
 
-	@PutMapping("floorDelete")
-	public  ResponseEntity<?> deleteFloor(@RequestParam("buildingId")int buildingId,@RequestParam("floorNum")int floorNum,
-	                                      @RequestParam("deleteData")MultipartFile deleteData) throws IOException {
+	@PutMapping("file/{buildingId}/{floorNum}")
+	public  ResponseEntity<?> deleteFloor(@RequestParam("buildingId")int buildingId,@RequestParam("floorNum")int floorNum) throws IOException {
 
-		byte[] floorDeleteData = deleteData.getBytes();
-
-		fileService.floorDelete(buildingId,floorNum,floorDeleteData);
+		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
 }
