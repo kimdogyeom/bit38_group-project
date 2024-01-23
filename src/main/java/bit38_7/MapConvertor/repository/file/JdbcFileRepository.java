@@ -122,7 +122,7 @@ public class JdbcFileRepository implements FileRepository {
 
 	@Override
 	public void upDateFloor(int buildingId,int floorNum, byte[] floorData) {
-		String sql = "update floor_table set floor_file_data =:floorData where floor_Num = :floorNum and building_id = :buildingId";
+		String sql = "update floor_table set floor_file_data =:floorData where floor_num = :floorNum and building_id = :buildingId";
 
 		log.info("buildingID,floorNum,floorData {},{},{}",buildingId,floorNum,floorData);
 
@@ -140,13 +140,14 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void deleteFloor(int buildingId,int floorNum) {
-		String sql = "delete from floor_table where building_id = :buildingId and floor_num = :floorNum";
+	public void deleteFloor(int buildingId,int floorNum,byte[] floorDeleteData) {
+		String sql = "update floor_table set floor_file_data =:floorDeleteData where building_id = :buildingId and floor_num = :floorNum";
 
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
-			params.addValue("building_id", buildingId);
-			params.addValue("floor_num", floorNum);
+			params.addValue("floorDeleteData", null);
+			params.addValue("buildingId", buildingId);
+			params.addValue("floorNum", floorNum);
 			template.update(sql, params);
 		}catch (DataAccessException e) {
 			log.info("error = {}", e.getMessage());

@@ -34,7 +34,7 @@ public class FileController {
 	/**
 	 * @RequestPart만 있을 때 ResourceHttpRequestHandler로 처리가 된다 왜?????
 	 */
-	@PostMapping("test/save")
+	@PostMapping("file/save")
 	public ResponseEntity<?> fileSave(@RequestPart("buildingInfo") String object,
 										@RequestPart("building") MultipartFile file,
 										@RequestPart("floor") List<MultipartFile> floors,
@@ -63,23 +63,26 @@ public class FileController {
 
 	@PutMapping("file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> upDateFloor(@RequestParam("buildingId")int buildingId ,@RequestParam("floorNum")int floorNum,
-										 @RequestParam("upDateFloor")MultipartFile upDataFloor)
+										 @RequestParam("updateFloor")MultipartFile updataFloor)
 			throws IOException {
 
 //		ObjectMapper objectMapper = new ObjectMapper();
 //		FloorFileInfo floorFileInfo = objectMapper.readValue(object, FloorFileInfo.class);
 //		log.info("floorInfo = {}",floorFileInfo);
-		byte[] floorUpData = upDataFloor.getBytes();
+		byte[] floorUpdata = updataFloor.getBytes();
 
-		fileService.floorUpData(buildingId,floorNum,floorUpData);
+		fileService.floorUpData(buildingId,floorNum,floorUpdata);
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
 
-	@DeleteMapping("floorDelete")
-	public  ResponseEntity<?> deleteFloor(@RequestParam("buildingId")int buildingId,@RequestParam("floorNum")int floorNum) {
+	@PutMapping("floorDelete")
+	public  ResponseEntity<?> deleteFloor(@RequestParam("buildingId")int buildingId,@RequestParam("floorNum")int floorNum,
+	                                      @RequestParam("deleteData")MultipartFile deleteData) throws IOException {
 
-		fileService.floorDelete(buildingId,floorNum);
+		byte[] floorDeleteData = deleteData.getBytes();
+
+		fileService.floorDelete(buildingId,floorNum,floorDeleteData);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
 }
