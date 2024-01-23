@@ -3,11 +3,9 @@ package bit38_7.MapConvertor.controller;
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.BuildingInfo;
 import bit38_7.MapConvertor.dto.BuildingResponse;
-import bit38_7.MapConvertor.dto.FloorFileInfo;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -16,9 +14,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -119,22 +119,23 @@ public class FileController {
 		return ResponseEntity.ok().body(floor);
 	}
 
-	@PostMapping("floorUpDate")
-	public ResponseEntity<?> upDateFloor(@RequestPart("floorFileInfo")String object)
-		throws JsonProcessingException {
+	@PutMapping("file/{buildingId}/{floorNum}")
+	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId,
+										@PathVariable("floorNum")int floorNum,
+										@RequestParam("updateFile")MultipartFile updateFile) throws IOException {
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		FloorFileInfo floorFileInfo = objectMapper.readValue(object, FloorFileInfo.class);
-		log.info("floorInfo = {}",floorFileInfo);
+		byte[] floorData = updateFile.getBytes();
 
-		fileService.floorUpData(floorFileInfo.getFloorNum(), floorFileInfo.getUpdateDate());
+		fileService.floorUpdate(buildingId,floorNum,floorData);
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
 
-	@PostMapping("floorDelete")
-	public  ResponseEntity<?> deleteFloor(@RequestPart("floorNum")int floorNum) {
-		fileService.floorDelete(floorNum);
+	@DeleteMapping("file/{buildingId}/{floorNum}")
+	public  ResponseEntity<?> deleteFloor(@PathVariable("buildingId")int buildingId,
+											@PathVariable("floorNum")int floorNum) {
+
+		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
 }

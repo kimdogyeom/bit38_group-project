@@ -39,16 +39,16 @@ public class FileService {
 	}
 
 	/*
-	* 층 정보 수정
-	* @param floorNum 층 번호
-	* @param floorData 층 데이터
-	*/
-	public void floorUpData(int floorNum,byte floorData) {
-		jdbcFileRepository.upDateFloor(floorNum,floorData);
+	 * 층 정보 수정
+	 * @param floorNum 층 번호
+	 * @param floorData 층 데이터
+	 */
+	public void floorUpdate(int buildingId, int floorNum, byte[] floorData) {
+		jdbcFileRepository.updatefloor(buildingId, floorNum, floorData);
 	}
 
-	public void floorDelete(int floorNum) {
-		jdbcFileRepository.deleteFloor(floorNum);
+	public void floorDelete(int buildingId,int floorNum) {
+		jdbcFileRepository.deleteFloor(buildingId, floorNum);
 	}
 
 

@@ -121,12 +121,12 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void upDateFloor(int floorNum, byte floorData) {
-		String sql = "update floor_table set floor_file_data =:floorData where floorNum = :floorNum";
-
+	public void updatefloor(int buildingId,int floorNum, byte[] floorData) {
+		String sql = "update floor_table set floor_file_data =:floorData where floor_num = :floorNum and building_id = :buildingId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
-			params.addValue("floor_file_data", floorData);
+			params.addValue("buildingId", buildingId);
+			params.addValue("floorData", floorData);
 			params.addValue("floorNum", floorNum);
 
 			template.update(sql, params);
@@ -136,17 +136,20 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void deleteFloor(int floorNum) {
-		String sql = "delete from floor_table where floor_num = :floorNum";
-
+	public void deleteFloor(int buildingId,int floorNum) {
+		String sql = "update floor_table set floor_file_data =:floorDeleteData where building_id = :buildingId and floor_num = :floorNum";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
-			params.addValue("floor_num", floorNum);
+			params.addValue("floorDeleteData", null);
+			params.addValue("buildingId", buildingId);
+			params.addValue("floorNum", floorNum);
+
 			template.update(sql, params);
 		}catch (DataAccessException e) {
 			log.info("error = {}", e.getMessage());
 		}
 	}
+
 
 
 	private RowMapper<FloorInfo> floorRowMapper() {
