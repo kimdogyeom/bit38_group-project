@@ -121,7 +121,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void updatefloor(int buildingId,int floorNum, byte[] floorData) {
+	public void updateFloor(int buildingId,int floorNum, byte[] floorData) {
 		String sql = "update floor_table set floor_file_data =:floorData where floor_num = :floorNum and building_id = :buildingId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();

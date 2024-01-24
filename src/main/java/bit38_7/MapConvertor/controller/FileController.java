@@ -33,7 +33,7 @@ public class FileController {
 
 	// "file" post로 받게 만들기
 	// REST API 따르게 만들기
-	@PostMapping("file/save")
+	@PostMapping("file")
 	public ResponseEntity<?> fileSave(@RequestParam("userId") int userId,
 									@RequestPart("buildingInfo") String object,
 									@RequestPart("building") MultipartFile file,
@@ -56,6 +56,20 @@ public class FileController {
 
 		return ResponseEntity.ok().body("저장 성공");
 	}
+
+
+	@PostMapping("file/{buildingId}/{floorNum}")
+	public ResponseEntity<?> addPartFloor(@PathVariable("buildingId") int buildingId,
+											@PathVariable("floorNum") int floorNum,
+											@RequestParam("updateFile") MultipartFile updateFile) throws IOException {
+
+		byte[] floorData = updateFile.getBytes();
+		fileService.addPartFloor(buildingId, floorNum, floorData);
+
+		return ResponseEntity.ok().body("수정 성공");
+	}
+
+
 
 	/**
 	 * 건물 리스트 조회
@@ -120,9 +134,8 @@ public class FileController {
 	}
 
 	@PutMapping("file/{buildingId}/{floorNum}")
-	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId,
-										@PathVariable("floorNum")int floorNum,
-										@RequestParam("updateFile")MultipartFile updateFile) throws IOException {
+	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId, @PathVariable("floorNum")int floorNum,
+										@RequestPart("updateFile")MultipartFile updateFile) throws IOException {
 
 		byte[] floorData = updateFile.getBytes();
 
@@ -132,7 +145,7 @@ public class FileController {
 	}
 
 	@DeleteMapping("file/{buildingId}/{floorNum}")
-	public  ResponseEntity<?> deleteFloor(@PathVariable("buildingId")int buildingId,
+	public ResponseEntity<?> deleteFloor(@PathVariable("buildingId")int buildingId,
 											@PathVariable("floorNum")int floorNum) {
 
 		fileService.floorDelete(buildingId,floorNum);

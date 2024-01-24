@@ -19,8 +19,7 @@ public interface FileRepository {
 
 	byte[] findFloorFile(int buildingId, int floorNum);
 
-	void updatefloor(int UserId,int floorNum, byte[] floorData);
+	void updateFloor(int UserId,int floorNum, byte[] floorData);
 
 	void deleteFloor(int userId,int floorNum);
-
 }

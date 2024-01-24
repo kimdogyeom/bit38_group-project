@@ -44,7 +44,7 @@ public class FileService {
 	 * @param floorData 층 데이터
 	 */
 	public void floorUpdate(int buildingId, int floorNum, byte[] floorData) {
-		jdbcFileRepository.updatefloor(buildingId, floorNum, floorData);
+		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
 	}
 
 	public void floorDelete(int buildingId,int floorNum) {
@@ -85,5 +85,9 @@ public class FileService {
 
 	public byte[] floorDownload(int buildingId, int floorNum) {
 		return jdbcFileRepository.findFloorFile(buildingId, floorNum);
+	}
+
+	public void addPartFloor(int buildingId, int floorNum, byte[] floorData) {
+		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
 	}
 }
