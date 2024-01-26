@@ -12,5 +12,5 @@ public class FloorInfo {
 
 	int floorNum;
 	LocalDate updateDate;
-
+	boolean isNull;
 }

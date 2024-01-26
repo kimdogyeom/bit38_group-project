@@ -2,6 +2,7 @@ package bit38_7.MapConvertor.repository.file;
 
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
+import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,8 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public int saveBuilding(int userId, String buildingName, byte[] buildingFacade, int buildingCount) {
+	public int saveBuilding(int userId, String buildingName, byte[] buildingFacade,
+		int buildingCount) {
 		String sql = "insert into building_table(fk_user_id, building_name, building_facade, building_floor) values(:userId, :buildingName, :buildingFacade, :buildingCount)";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
@@ -102,7 +104,6 @@ public class JdbcFileRepository implements FileRepository {
 			log.info("error = {}", e.getMessage());
 			return null;
 		}
-
 	}
 
 	@Override
@@ -136,11 +137,10 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void deleteFloor(int buildingId,int floorNum) {
-		String sql = "update floor_table set floor_file_data =:floorDeleteData where building_id = :buildingId and floor_num = :floorNum";
+	public void deleteFloor(int buildingId, int floorNum) {
+		String sql = "update floor_table set floor_file_data = null where building_id = :buildingId and floor_num = :floorNum";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
-			params.addValue("floorDeleteData", null);
 			params.addValue("buildingId", buildingId);
 			params.addValue("floorNum", floorNum);
 
@@ -151,14 +151,50 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 
+	@Override
+	public void deleteBuilding(int buildingId) {
+		String sql = "delete from building_table where building_id = :buildingId";
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("buildingId", buildingId);
+
+			template.update(sql, params);
+		}catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+		}
+	}
+
+	@Override
+	public void deleteFloorAll(int buildingId) {
+		String sql = "delete from floor_table where building_id = :buildingId";
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("buildingId", buildingId);
+
+			template.update(sql, params);
+		}catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+		}
+	}
+
+
+
 
 	private RowMapper<FloorInfo> floorRowMapper() {
-		return BeanPropertyRowMapper.newInstance(FloorInfo.class);
+		return (rs, rowNum) -> {
+			FloorInfo floorInfo = new FloorInfo();
+			floorInfo.setFloorNum(rs.getInt("floor_num"));
+			floorInfo.setUpdateDate(rs.getObject("update_date", LocalDate.class));
+			if(rs.getBytes("floor_file_data") == null)
+				floorInfo.setNull(true);
+			else
+				floorInfo.setNull(false);
+			return floorInfo;
+		};
 	}
 
 	private RowMapper<BuildingResponse> buildingRowMapper() {
 		return BeanPropertyRowMapper.newInstance(BuildingResponse.class);
 	}
-
 }
 

@@ -135,8 +135,7 @@ public class FileController {
 
 	@PutMapping("file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId, @PathVariable("floorNum")int floorNum,
-										@RequestPart("updateFile")MultipartFile updateFile) throws IOException {
-
+										@RequestParam("file")MultipartFile updateFile) throws IOException {
 		byte[] floorData = updateFile.getBytes();
 
 		fileService.floorUpdate(buildingId,floorNum,floorData);
@@ -149,6 +148,13 @@ public class FileController {
 											@PathVariable("floorNum")int floorNum) {
 
 		fileService.floorDelete(buildingId,floorNum);
+		return ResponseEntity.ok().body("삭제 성공");
+	}
+
+	@DeleteMapping("file/{buildingId}")
+	public ResponseEntity<?> deleteBuilding(@PathVariable("buildingId")int buildingId) {
+
+		fileService.buildingDelete(buildingId);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
 }
