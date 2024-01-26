@@ -22,4 +22,6 @@ public interface FileRepository {
 	void updateFloor(int UserId,int floorNum, byte[] floorData);
 
 	void deleteFloor(int userId,int floorNum);
+
+	int FindById(int userId, int buildingId);
 }

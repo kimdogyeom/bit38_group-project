@@ -150,6 +150,20 @@ public class JdbcFileRepository implements FileRepository {
 		}
 	}
 
+	@Override
+	public int FindById(int userId, int buildingId) {
+
+		String sql = "SELECT COUNT(*) FROM building_table WHERE building_id =:building AND fk_user_id =:userId;";
+		try {
+			MapSqlParameterSource param = new MapSqlParameterSource();
+			param.addValue("userId", userId);
+			param.addValue("building", buildingId);
+			return  template.queryForObject(sql, param, Integer.class);
+		} catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+			return 0;
+		}
+	}
 
 
 	private RowMapper<FloorInfo> floorRowMapper() {
