@@ -1,19 +1,27 @@
 package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
+import bit38_7.MapConvertor.dto.Building;
 import bit38_7.MapConvertor.dto.BuildingInfo;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +30,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -33,28 +42,48 @@ public class FileController {
 
 	// "file" post로 받게 만들기
 	// REST API 따르게 만들기
-	@PostMapping("file")
-	public ResponseEntity<?> fileSave(@RequestParam("userId") int userId,
-									@RequestPart("buildingInfo") String object,
-									@RequestPart("building") MultipartFile file,
-									@RequestPart("floor") List<MultipartFile> floors) throws IOException {
+	@PostMapping(value = "file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> fileSave(@RequestParam("buildingName") String buildingName,
+									@RequestParam("floorCount") int floorCount,
+									@RequestPart("files") List<MultipartFile> floors) throws IOException {
+		BuildingInfo buildingInfo = new BuildingInfo();
+		buildingInfo.setBuildingName(buildingName);
+		buildingInfo.setBuildingCount(floorCount);
 
-		// 이거 service단으로 빼서 처리하기
-		ObjectMapper objectMapper = new ObjectMapper();
-		BuildingInfo buildingInfo = objectMapper.readValue(object, BuildingInfo.class);
-		log.info("buildingInfo = {}", buildingInfo);
+		String url = "http://10.101.69.52:7070/model";
 
-		// 세션에 로그인 회원 정보 보관
-		int buildingId = fileService.buildingSave(userId, buildingInfo, file.getBytes());
-		log.info("buildingId = {}", buildingId);
+		List<byte[]> floorData = new ArrayList<>();
 
-
-		int floorNum = 1;
 		for (MultipartFile floor : floors) {
-			fileService.floorSave(buildingId, floorNum++, floor.getBytes());
+			floorData.add(floor.getBytes());
 		}
+		MultiValueMap<String, List<byte[]>> params = new LinkedMultiValueMap<>();
+		params.add("files", floorData);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+		HttpEntity<MultiValueMap<String, List<byte[]>>> entity = new HttpEntity<>(params, headers);
+
+		RestTemplate rt = new RestTemplate();
+
+		ResponseEntity<Building> response = rt.exchange(
+			url,
+			HttpMethod.POST,
+			entity,
+			Building.class
+		);
+
+		Building body = response.getBody();
+		log.info("response = {}", body);
 
 		return ResponseEntity.ok().body("저장 성공");
+	}
+
+	private static Long getUserId(HttpSession request) {
+		HttpSession session = request;
+		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+		return user.getUserId();
 	}
 
 
@@ -83,9 +112,7 @@ public class FileController {
 	@GetMapping("file/list")
 	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
 
-		HttpSession session = request.getSession(false);
-		User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
-		Long userId = user.getUserId();
+		Long userId = getUserId(request.getSession(false));
 
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
 		log.info("buildingList = {}", buildingList);
