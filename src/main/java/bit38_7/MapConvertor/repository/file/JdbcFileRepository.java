@@ -151,8 +151,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public int FindById(int userId, int buildingId) {
-
+	public int findById(int userId, int buildingId) {
 		String sql = "SELECT COUNT(*) FROM building_table WHERE building_id =:building AND fk_user_id =:userId;";
 		try {
 			MapSqlParameterSource param = new MapSqlParameterSource();

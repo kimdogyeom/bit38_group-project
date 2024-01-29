@@ -1,24 +1,23 @@
 package bit38_7.MapConvertor.config;
 
 
-import bit38_7.MapConvertor.argumentresolver.LoginMemberArgumentResolver;
 import bit38_7.MapConvertor.interceptor.BuildingCheckInterceptor;
 import bit38_7.MapConvertor.interceptor.LogInterceptor;
 import bit38_7.MapConvertor.interceptor.LoginCheckInterceptor;
-import java.util.List;
-
 import bit38_7.MapConvertor.repository.file.JdbcFileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.sql.DataSource;
-
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
+
+	public WebConfig(JdbcFileRepository jdbcFileRepository) {
+		this.jdbcFileRepository = jdbcFileRepository;
+	}
+
+	private final JdbcFileRepository jdbcFileRepository;
 
 	/**
 	 * CORS 설정
@@ -31,12 +30,13 @@ public class WebConfig implements WebMvcConfigurer{
 	}
 
 
-	private final JdbcFileRepository jdbcFileRepository;
-
-	@Autowired
-	public WebConfig(JdbcFileRepository jdbcFileRepository) {
-		this.jdbcFileRepository = jdbcFileRepository;
-	}
+//	/**
+//	 * 로그인한 사용자 정보를 HandlerMethodArgumentResolver 에서 사용할 수 있도록 설정
+//	 */
+//	@Override
+//	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+//		resolvers.add(new LoginMemberArgumentResolver());
+//	}
 
 
 	/**
@@ -55,10 +55,9 @@ public class WebConfig implements WebMvcConfigurer{
 			.excludePathPatterns("/file/**","/v3/api-docs/**","/swagger-ui/**","/file/save", "/users/id","/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");
 
 		registry.addInterceptor(new BuildingCheckInterceptor(jdbcFileRepository))
-				.order(3)
-				.addPathPatterns("/{buildingId}/**")
-				.excludePathPatterns("/v3/api-docs/**","/swagger-ui/**","/file/save", "/users/id","/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");
-
+			.order(3)
+			.addPathPatterns("/file/{buildingId}/**")
+			.excludePathPatterns("/v3/api-docs/**","/swagger-ui/**", "/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");// 여기 사용자가 qr로 접근할때 문제있을듯 나중에 검토
 	}
 
 }
