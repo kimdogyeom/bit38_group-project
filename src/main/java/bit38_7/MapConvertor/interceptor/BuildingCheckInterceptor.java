@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
+
+import java.util.Map;
 
 @Slf4j
 public class BuildingCheckInterceptor implements HandlerInterceptor {
@@ -20,7 +23,6 @@ public class BuildingCheckInterceptor implements HandlerInterceptor {
         this.jdbcFileRepository = jdbcFileRepository;
     }
 
-    //
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
@@ -28,11 +30,12 @@ public class BuildingCheckInterceptor implements HandlerInterceptor {
         User user = (User)session.getAttribute(SessionConst.LOGIN_MEMBER);
         int userId = user.getUserId().intValue();
 
-        String requestURI = request.getRequestURI(); //요청 url 온것을 받는 것
-        String[] result = requestURI.split("/", 4);
-        int BuildingId = Integer.parseInt(result[2]);
 
-        int results = jdbcFileRepository.FindById(userId,BuildingId);
+        final Map<String,String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        int buildingId = Integer.parseInt(String.valueOf(pathVariables.get("buildingId")));
+        log.info("buildingId{}",buildingId);
+
+        int results = jdbcFileRepository.FindById(userId,buildingId);
 
         if (results == 0) {
             log.info("잘못 입력된 빌딩 정보와 유저 정보 입니다");
