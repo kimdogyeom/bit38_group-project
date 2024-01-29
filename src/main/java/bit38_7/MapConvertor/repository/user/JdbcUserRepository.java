@@ -34,6 +34,11 @@ public class JdbcUserRepository implements UserRepository {
 		String sql = "insert into users(login_id, user_name, password, email) values(:loginId, :userName, :password, :email)";
 
 		try {
+//			String result = checkId(user.getLoginId());
+//			if (result == null) {
+//				return null;
+//			}
+
 			SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 
 			KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -63,6 +68,23 @@ public class JdbcUserRepository implements UserRepository {
 			return Optional.empty();
 		}
 	}
+
+//	//추가된 부분
+//	@Override
+//	public String checkId(String loginId) {
+//		String sql = "select login_id from users where login_id = :loginId";
+//
+//		try{
+//			log.info("findParam = {}", loginId);
+//			SqlParameterSource param = new BeanPropertySqlParameterSource(loginId);
+//			User user = template.queryForObject(sql, param, userRowMapper());
+//			log.info("user = {}", user);
+//			return user.getLoginId();
+//		}
+//		catch (EmptyResultDataAccessException e) {
+//			return null;
+//		}
+//	}
 
 
 	@Override

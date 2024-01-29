@@ -1,14 +1,11 @@
 package bit38_7.MapConvertor.config;
 
 
-import bit38_7.MapConvertor.argumentresolver.LoginMemberArgumentResolver;
 import bit38_7.MapConvertor.interceptor.BuildingCheckInterceptor;
 import bit38_7.MapConvertor.interceptor.LogInterceptor;
 import bit38_7.MapConvertor.interceptor.LoginCheckInterceptor;
 import bit38_7.MapConvertor.repository.file.JdbcFileRepository;
-import java.util.List;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

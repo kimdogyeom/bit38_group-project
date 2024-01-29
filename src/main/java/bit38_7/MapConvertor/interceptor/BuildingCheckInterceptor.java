@@ -21,6 +21,7 @@ public class BuildingCheckInterceptor implements HandlerInterceptor {
         this.jdbcFileRepository = jdbcFileRepository;
     }
 
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
@@ -40,7 +41,6 @@ public class BuildingCheckInterceptor implements HandlerInterceptor {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             return false;
         }
-
         return true;
     }
 
