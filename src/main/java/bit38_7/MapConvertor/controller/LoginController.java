@@ -70,10 +70,9 @@ public class LoginController {
 
 
 
-	//TODO
-	// 회원가입 valid달아서 검증처리 추가 + 코드 구조 다시 생각해보기
 	@PostMapping("/join")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errors = new HashMap<>();
 			for (FieldError error : bindingResult.getFieldErrors()) {

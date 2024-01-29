@@ -2,8 +2,10 @@ package bit38_7.MapConvertor.config;
 
 
 import bit38_7.MapConvertor.argumentresolver.LoginMemberArgumentResolver;
+import bit38_7.MapConvertor.interceptor.BuildingCheckInterceptor;
 import bit38_7.MapConvertor.interceptor.LogInterceptor;
 import bit38_7.MapConvertor.interceptor.LoginCheckInterceptor;
+import bit38_7.MapConvertor.repository.file.JdbcFileRepository;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -13,6 +15,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer{
+
+	public WebConfig(JdbcFileRepository jdbcFileRepository) {
+		this.jdbcFileRepository = jdbcFileRepository;
+	}
+
+	private final JdbcFileRepository jdbcFileRepository;
 
 	/**
 	 * CORS 설정
@@ -48,6 +56,11 @@ public class WebConfig implements WebMvcConfigurer{
 			.order(2)
 			.addPathPatterns("/**")
 			.excludePathPatterns("/file/**","/v3/api-docs/**","/swagger-ui/**","/file/save", "/users/id","/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");
+
+		registry.addInterceptor(new BuildingCheckInterceptor(jdbcFileRepository))
+			.order(3)
+			.addPathPatterns("/file/{buildingId}/**")
+			.excludePathPatterns("/v3/api-docs/**","/swagger-ui/**", "/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");// 여기 사용자가 qr로 접근할때 문제있을듯 나중에 검토
 	}
 
 }
