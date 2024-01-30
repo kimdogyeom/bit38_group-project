@@ -47,17 +47,16 @@ public class WebConfig implements WebMvcConfigurer{
 		registry.addInterceptor(new LogInterceptor())
 			.order(1)
 			.addPathPatterns("/**")
-			.excludePathPatterns("/error");
+			.excludePathPatterns("/error", "/*.ico");
 
 		registry.addInterceptor(new LoginCheckInterceptor())
 			.order(2)
 			.addPathPatterns("/**")
-			.excludePathPatterns("/file/**","/v3/api-docs/**","/swagger-ui/**","/file/save", "/users/id","/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");
+			.excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**", "/users/**", "/join", "/login", "/logout", "/error", "/*.ico", "/error");
 
 		registry.addInterceptor(new BuildingCheckInterceptor(jdbcFileRepository))
 			.order(3)
-			.addPathPatterns("/file/{buildingId}/**")
-			.excludePathPatterns("/v3/api-docs/**","/swagger-ui/**", "/users/pw", "/join", "/login", "/logout", "/error", "/*.ico");// 여기 사용자가 qr로 접근할때 문제있을듯 나중에 검토
+			.addPathPatterns("/file/{buildingId}/**");
 	}
 
 }

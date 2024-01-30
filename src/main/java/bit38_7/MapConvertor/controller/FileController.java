@@ -2,17 +2,15 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.BuildingInfo;
+import bit38_7.MapConvertor.dto.BuildingRenderResponse;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
-import bit38_7.MapConvertor.dto.BuildingRenderResponse;
 import bit38_7.MapConvertor.dto.floorRenderResponse;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +51,7 @@ public class FileController {
 		BuildingInfo buildingInfo = new BuildingInfo(buildingName, floorCount);
 		Long userId = getUserId(request);
 
-		String url = "http://10.101.68.13:7090/model";
+		String url = "http://10.101.69.52:7080/model";
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		for (MultipartFile floor : floors) {
@@ -77,7 +75,7 @@ public class FileController {
 		Map<Integer, String> floorDataMap = responseBody.getFloorData();
 		int floorNum = 1;
 		for (String floorData : floorDataMap.values()) {
-			fileService.floorSave(buildingId, floorNum, getDecodeByte(floorData));
+			fileService.floorSave(buildingId, floorNum++, getDecodeByte(floorData));
 		}
 
 		return ResponseEntity.ok().body("저장 성공");
@@ -89,7 +87,7 @@ public class FileController {
 											@PathVariable("floorNum") int floorNum,
 											@RequestParam("updateFile") MultipartFile updateFile) throws IOException {
 
-		String url = "http://10.101.68.13:7090/model";
+		String url = "http://10.101.69.52:7080/model/addPartial";
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		ByteArrayResource resource = new ByteArrayResource(updateFile.getBytes()) {
@@ -123,12 +121,7 @@ public class FileController {
 
 	/**
 	 * 건물 리스트 조회
-	 * userId를 직접 받는게 아니라 세션값에서 꺼내서 쓸것임
 	 * @return 유저가 생성한 건물 리스트
-	 * 여기서 건물 - 층 까지 넘겨주면 어떨까?
-	 * 굳이 2번 요청을 보낼 필요가 있나?
-	 *
-	 * 이거는 건물만 보내는 방법
 	 */
 	@GetMapping("file/list")
 	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
@@ -182,7 +175,8 @@ public class FileController {
 	}
 
 	@PutMapping("file/{buildingId}/{floorNum}")
-	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId, @PathVariable("floorNum")int floorNum,
+	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId,
+										@PathVariable("floorNum")int floorNum,
 										@RequestPart("updateFile")MultipartFile updateFile) throws IOException {
 
 		byte[] floorData = updateFile.getBytes();
@@ -199,6 +193,8 @@ public class FileController {
 		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
+
+
 
 
 	private static byte[] getDecodeByte(String encodingData) {
