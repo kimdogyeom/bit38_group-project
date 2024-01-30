@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FileRepository {
 
-	int saveBuilding(int userId, String buildingName, byte[] buildingFacade, int buildingCount);
+	int saveBuilding(Long userId, String buildingName, byte[] buildingFacade, int buildingCount);
 
 	void saveFloor(int buildingId, int floorNum, byte[] floorData);
 
@@ -19,7 +19,7 @@ public interface FileRepository {
 
 	byte[] findFloorFile(int buildingId, int floorNum);
 
-	void updateFloor(int UserId,int floorNum, byte[] floorData);
+	void updateFloor(int buildingId,int floorNum, byte[] floorData);
 
-	void deleteFloor(int userId,int floorNum);
+	void deleteFloor(int buildingId,int floorNum);
 }

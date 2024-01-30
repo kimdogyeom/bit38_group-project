@@ -9,4 +9,9 @@ import lombok.RequiredArgsConstructor;
 public class BuildingInfo {
 	String buildingName;
 	int buildingCount;
+
+	public BuildingInfo(String buildingName, int buildingCount) {
+		this.buildingName = buildingName;
+		this.buildingCount = buildingCount;
+	}
 }

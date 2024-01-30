@@ -25,7 +25,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public int saveBuilding(int userId, String buildingName, byte[] buildingFacade, int buildingCount) {
+	public int saveBuilding(Long userId, String buildingName, byte[] buildingFacade, int buildingCount) {
 		String sql = "insert into building_table(fk_user_id, building_name, building_facade, building_floor) values(:userId, :buildingName, :buildingFacade, :buildingCount)";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();

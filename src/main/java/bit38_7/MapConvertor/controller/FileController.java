@@ -1,20 +1,24 @@
 package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
-import bit38_7.MapConvertor.dto.Building;
 import bit38_7.MapConvertor.dto.BuildingInfo;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
+import bit38_7.MapConvertor.dto.BuildingRenderResponse;
+import bit38_7.MapConvertor.dto.floorRenderResponse;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -40,50 +44,43 @@ public class FileController {
 
 	private final FileService fileService;
 
-	// "file" post로 받게 만들기
-	// REST API 따르게 만들기
-	@PostMapping(value = "file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping("file")
 	public ResponseEntity<?> fileSave(@RequestParam("buildingName") String buildingName,
 									@RequestParam("floorCount") int floorCount,
-									@RequestPart("files") List<MultipartFile> floors) throws IOException {
-		BuildingInfo buildingInfo = new BuildingInfo();
-		buildingInfo.setBuildingName(buildingName);
-		buildingInfo.setBuildingCount(floorCount);
+									@RequestPart("files") List<MultipartFile> floors,
+									HttpServletRequest request) throws IOException {
 
-		String url = "http://10.101.69.52:7070/model";
+		BuildingInfo buildingInfo = new BuildingInfo(buildingName, floorCount);
+		Long userId = getUserId(request);
 
-		List<byte[]> floorData = new ArrayList<>();
+		String url = "http://10.101.68.13:7090/model";
 
+		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		for (MultipartFile floor : floors) {
-			floorData.add(floor.getBytes());
+			ByteArrayResource resource = new ByteArrayResource(floor.getBytes()) {
+				public String getFilename() {return floor.getOriginalFilename();}
+			};
+			params.add("floors", resource);
 		}
-		MultiValueMap<String, List<byte[]>> params = new LinkedMultiValueMap<>();
-		params.add("files", floorData);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-		HttpEntity<MultiValueMap<String, List<byte[]>>> entity = new HttpEntity<>(params, headers);
+		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
 
-		RestTemplate rt = new RestTemplate();
+		ResponseEntity<BuildingRenderResponse> response = getBuildingRenderResponse(url, entity);
+		BuildingRenderResponse responseBody = response.getBody();
 
-		ResponseEntity<Building> response = rt.exchange(
-			url,
-			HttpMethod.POST,
-			entity,
-			Building.class
-		);
+		int buildingId = fileService.buildingSave(userId, buildingInfo,
+			getDecodeByte(responseBody.getBuildingData()));
 
-		Building body = response.getBody();
-		log.info("response = {}", body);
+		Map<Integer, String> floorDataMap = responseBody.getFloorData();
+		int floorNum = 1;
+		for (String floorData : floorDataMap.values()) {
+			fileService.floorSave(buildingId, floorNum, getDecodeByte(floorData));
+		}
 
 		return ResponseEntity.ok().body("저장 성공");
-	}
-
-	private static Long getUserId(HttpSession request) {
-		HttpSession session = request;
-		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
-		return user.getUserId();
 	}
 
 
@@ -92,8 +89,32 @@ public class FileController {
 											@PathVariable("floorNum") int floorNum,
 											@RequestParam("updateFile") MultipartFile updateFile) throws IOException {
 
-		byte[] floorData = updateFile.getBytes();
-		fileService.addPartFloor(buildingId, floorNum, floorData);
+		String url = "http://10.101.68.13:7090/model";
+
+		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+		ByteArrayResource resource = new ByteArrayResource(updateFile.getBytes()) {
+			public String getFilename() {
+				return updateFile.getOriginalFilename();
+			}
+		};
+
+		params.add("floor", resource);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
+
+		RestTemplate rt = new RestTemplate();
+		ResponseEntity<floorRenderResponse> response = rt.exchange(
+			url,
+			HttpMethod.POST,
+			entity,
+			floorRenderResponse.class
+		);
+		byte[] floorBytes = getDecodeByte(response.getBody().getFloorData());
+
+		fileService.addPartFloor(buildingId, floorNum, floorBytes);
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
@@ -112,7 +133,7 @@ public class FileController {
 	@GetMapping("file/list")
 	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
 
-		Long userId = getUserId(request.getSession(false));
+		Long userId = getUserId(request);
 
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
 		log.info("buildingList = {}", buildingList);
@@ -178,4 +199,29 @@ public class FileController {
 		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
+
+
+	private static byte[] getDecodeByte(String encodingData) {
+		return Base64.getDecoder().decode(encodingData);
+	}
+
+	private static Long getUserId(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+		return user.getUserId();
+	}
+
+	private static ResponseEntity<BuildingRenderResponse> getBuildingRenderResponse(
+		String url, HttpEntity<MultiValueMap<String, Object>> entity) {
+		RestTemplate rt = new RestTemplate();
+		ResponseEntity<BuildingRenderResponse> response = rt.exchange(
+			url,
+			HttpMethod.POST,
+			entity,
+			BuildingRenderResponse.class
+		);
+		return response;
+	}
+
+
 }
