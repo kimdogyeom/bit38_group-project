@@ -179,7 +179,7 @@ public class FileController {
 										@PathVariable("floorNum")int floorNum,
 										@RequestPart("updateFile")MultipartFile updateFile) throws IOException {
 
-		byte[] floorData = updateFile.getBytes();
+    byte[] floorData = updateFile.getBytes();
 
 		fileService.floorUpdate(buildingId,floorNum,floorData);
 
@@ -193,8 +193,8 @@ public class FileController {
 		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
-
-
+  
+  
 
 
 	private static byte[] getDecodeByte(String encodingData) {
@@ -218,6 +218,5 @@ public class FileController {
 		);
 		return response;
 	}
-
 
 }

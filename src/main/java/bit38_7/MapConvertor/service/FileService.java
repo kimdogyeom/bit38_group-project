@@ -8,6 +8,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -47,10 +48,10 @@ public class FileService {
 		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
 	}
 
+
 	public void floorDelete(int buildingId,int floorNum) {
 		jdbcFileRepository.deleteFloor(buildingId, floorNum);
 	}
-
 
 
 	/**
@@ -59,16 +60,6 @@ public class FileService {
 	 */
 	public List<BuildingResponse> buildingList(Long userId) {
 		return jdbcFileRepository.userBuildingList(userId);
-	}
-
-	/**
-	 * 건물 조회
-	 * @param buildingId 건물아이디
-	 */
-	public BuildingResponse building(int buildingId) {
-//		return jdbcFileRepository.userBuildingList2(buildingId);
-		return null;
-
 	}
 
 	/**
@@ -89,5 +80,11 @@ public class FileService {
 
 	public void addPartFloor(int buildingId, int floorNum, byte[] floorData) {
 		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
+	}
+
+	@Transactional
+	public void buildingDelete(int buildingId) {
+		jdbcFileRepository.deleteFloorAll(buildingId);
+		jdbcFileRepository.deleteBuilding(buildingId);
 	}
 }
