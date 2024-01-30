@@ -25,4 +25,8 @@ public interface FileRepository {
 
 	int findById(int userId, int buildingId);
 
+	void deleteBuilding(int buildingId);
+
+	void deleteFloorAll(int buildingId);
+
 }
