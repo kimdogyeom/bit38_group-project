@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FileRepository {
 
-	int saveBuilding(int userId, String buildingName, byte[] buildingFacade, int buildingCount);
+	int saveBuilding(Long userId, String buildingName, byte[] buildingFacade, int buildingCount);
 
 	void saveFloor(int buildingId, int floorNum, byte[] floorData);
 

@@ -24,7 +24,7 @@ public class FileService {
 	 * @param fileData 건물사진
 	 * @return 건물아이디
 	 */
-	public int buildingSave(int userId,BuildingInfo buildingInfo, byte[] fileData) {
+	public int buildingSave(Long userId,BuildingInfo buildingInfo, byte[] fileData) {
 		return jdbcFileRepository.saveBuilding(userId, buildingInfo.getBuildingName(), fileData, buildingInfo.getBuildingCount());
 	}
 
