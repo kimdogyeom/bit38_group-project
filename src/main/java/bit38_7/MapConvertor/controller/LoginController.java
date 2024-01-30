@@ -2,6 +2,7 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.LoginRequest;
+import bit38_7.MapConvertor.exception.LoginFailureException;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +29,8 @@ public class LoginController {
 	private final UserService userService;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(HttpServletRequest request, @RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<?> login(HttpServletRequest request, @RequestBody LoginRequest loginRequest)
+	{
 		User user = new User();
 		user.setLoginId(loginRequest.getLoginId());
 		user.setPassword(loginRequest.getPassword());
@@ -38,8 +40,7 @@ public class LoginController {
 		User loginResult = userService.login(user);
 
 		if (loginResult == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body("아이디 또는 비밀번호가 맞지 않습니다.");
+			throw new LoginFailureException();
 		}
 
 		// 로그인 성공 처리
@@ -72,6 +73,7 @@ public class LoginController {
 
 	@PostMapping("/join")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+
 		if (bindingResult.hasErrors()) {
 			Map<String, String> errors = new HashMap<>();
 			for (FieldError error : bindingResult.getFieldErrors()) {
