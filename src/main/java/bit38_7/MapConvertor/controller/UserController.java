@@ -4,6 +4,7 @@ package bit38_7.MapConvertor.controller;
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.InfoRequest;
 import bit38_7.MapConvertor.dto.UserRequest;
+import bit38_7.MapConvertor.exception.MemberNotFoundException;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,7 +65,7 @@ public class UserController {
 		log.info("아이디찾기 결과={}", loginId);
 
 		if (loginId == null) {
-			return ResponseEntity.badRequest().body("해당하는 유저가 없습니다.");
+			throw new MemberNotFoundException();
 		}
 
 		return ResponseEntity.ok().body(loginId);
@@ -93,7 +94,7 @@ public class UserController {
 		log.info("비밀번호 찾기결과={}", password);
 
 		if (password == null) {
-			return ResponseEntity.badRequest().body("해당하는 유저가 없습니다.");
+			throw new MemberNotFoundException();
 		}
 
 		return ResponseEntity.ok().body(password);

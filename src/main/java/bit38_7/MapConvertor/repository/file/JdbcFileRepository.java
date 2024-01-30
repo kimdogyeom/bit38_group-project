@@ -26,8 +26,8 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public int saveBuilding(int userId, String buildingName, byte[] buildingFacade,
-		int buildingCount) {
+
+	public int saveBuilding(Long userId, String buildingName, byte[] buildingFacade, int buildingCount) {
 		String sql = "insert into building_table(fk_user_id, building_name, building_facade, building_floor) values(:userId, :buildingName, :buildingFacade, :buildingCount)";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
@@ -150,6 +150,19 @@ public class JdbcFileRepository implements FileRepository {
 		}
 	}
 
+	@Override
+	public int findById(int userId, int buildingId) {
+		String sql = "SELECT COUNT(*) FROM building_table WHERE building_id =:building AND fk_user_id =:userId;";
+		try {
+			MapSqlParameterSource param = new MapSqlParameterSource();
+			param.addValue("userId", userId);
+			param.addValue("building", buildingId);
+			return  template.queryForObject(sql, param, Integer.class);
+		} catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+			return 0;
+		}
+	}
 
 	@Override
 	public void deleteBuilding(int buildingId) {
