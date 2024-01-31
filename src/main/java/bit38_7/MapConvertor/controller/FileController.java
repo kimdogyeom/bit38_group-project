@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -51,7 +52,7 @@ public class FileController {
 		BuildingInfo buildingInfo = new BuildingInfo(buildingName, floorCount);
 		Long userId = getUserId(request);
 
-		String url = "http://10.101.69.52:7080/model";
+		String url = "http://10.101.68.13:7080/model";
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		for (MultipartFile floor : floors) {
@@ -73,9 +74,11 @@ public class FileController {
 			getDecodeByte(responseBody.getBuildingData()));
 
 		Map<Integer, String> floorDataMap = responseBody.getFloorData();
-		int floorNum = 1;
-		for (String floorData : floorDataMap.values()) {
-			fileService.floorSave(buildingId, floorNum++, getDecodeByte(floorData));
+
+		for (Map.Entry<Integer, String> entry : floorDataMap.entrySet()) {
+			Integer floorNum = entry.getKey();
+			String floorData = entry.getValue();
+			fileService.floorSave(buildingId, floorNum, getDecodeByte(floorData));
 		}
 
 		return ResponseEntity.ok().body("저장 성공");
@@ -87,7 +90,7 @@ public class FileController {
 											@PathVariable("floorNum") int floorNum,
 											@RequestParam("updateFile") MultipartFile updateFile) throws IOException {
 
-		String url = "http://10.101.69.52:7080/model/addPartial";
+		String url = "http://10.101.68.13:7080/model/addPartial";
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		ByteArrayResource resource = new ByteArrayResource(updateFile.getBytes()) {
