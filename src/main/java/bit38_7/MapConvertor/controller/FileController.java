@@ -71,22 +71,8 @@ public class FileController {
 		ResponseEntity<BuildingRenderResponse> response = getBuildingRenderResponse(url, entity);
 		BuildingRenderResponse responseBody = response.getBody();
 
-		int buildingId = fileService.buildingSave(userId, buildingInfo, getDecodeByte(responseBody.getBuildingData()));
+		fileService.fileSave(userId, buildingInfo,responseBody);
 
-
-		Map<Integer, String> floorDataMap = responseBody.getFloorData();
-		Map<Integer, String> floorJsonData = responseBody.getMetaData();
-
-		for(Integer floorKey : floorDataMap.keySet()) {
-			fileService.floorSave(buildingId, floorKey,
-				getDecodeByte(floorDataMap.get(floorKey)),
-				getDecodeByte(floorJsonData.get(floorKey)));
-
-
-			// TODO 건물파일 생성 후 잘 받는지 로그찍어본 것 확인 후 지우기
-			log.info("floorDataMap.get(floorKey) = {}", floorDataMap.get(floorKey));
-			log.info("floorJsonData.get(floorKey) = {}", floorJsonData.get(floorKey));
-		}
 
 		return ResponseEntity.ok().body("저장 성공");
 	}
@@ -120,10 +106,8 @@ public class FileController {
 			entity,
 			floorRenderResponse.class
 		);
-		byte[] floorBytes = getDecodeByte(response.getBody().getFloorData());
-		byte[] floorMetaBytes = getDecodeByte(response.getBody().getMetaData());
 
-		fileService.addPartFloor(buildingId, floorNum, floorBytes, floorMetaBytes);
+		fileService.addPartFloor(buildingId,floorNum,response.getBody());
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
@@ -225,15 +209,6 @@ public class FileController {
 
 		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
-	}
-
-
-
-
-
-
-	private static byte[] getDecodeByte(String encodingData) {
-		return Base64.getDecoder().decode(encodingData);
 	}
 
 	private static int getUserId(HttpServletRequest request) {

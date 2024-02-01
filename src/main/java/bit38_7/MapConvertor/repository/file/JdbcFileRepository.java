@@ -121,7 +121,7 @@ public class JdbcFileRepository implements FileRepository {
 			return null;
 		}
 	}
-
+//
 	@Override
 	public void updateFloor(int buildingId,int floorNum, byte[] floorData, byte[] metaData) {
 		String sql = "update floor_table set floor_file_data =:floorData, meta_data =:metaData  where floor_num = :floorNum and building_id = :buildingId";
