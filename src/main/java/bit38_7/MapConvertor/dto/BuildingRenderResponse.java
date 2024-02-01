@@ -8,5 +8,5 @@ public class BuildingRenderResponse {
 
 	String buildingData;
 	Map<Integer, String> floorData;
-
+	Map<Integer, String> metaData;
 }
