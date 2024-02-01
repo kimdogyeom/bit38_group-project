@@ -56,7 +56,9 @@ public class WebConfig implements WebMvcConfigurer{
 
 		registry.addInterceptor(new BuildingCheckInterceptor(jdbcFileRepository))
 			.order(3)
-			.addPathPatterns("/file/{buildingId}/**");
+			.addPathPatterns("/file/{buildingId}/**")
+			.excludePathPatterns("/file/list","/v3/api-docs/**", "/swagger-ui/**", "/users/**", "/join", "/login", "/logout", "/error", "/*.ico", "/error");
+		// todo 이 시발롬 어떻게 돌아가는지 패턴 적용 순서 확인해야함
 	}
 
 }

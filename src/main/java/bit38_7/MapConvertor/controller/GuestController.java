@@ -1,6 +1,7 @@
 package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.dto.FloorInfo;
+import bit38_7.MapConvertor.dto.ModelResponse;
 import bit38_7.MapConvertor.service.FileService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -53,9 +54,15 @@ public class GuestController {
 	public ResponseEntity<?> floorDownload(@PathVariable("buildingId") int buildingId,
 		@PathVariable("floorNum") int floorNum) {
 
-		byte[] floor = fileService.floorDownload(buildingId, floorNum);
+		ModelResponse modelResponse = fileService.floorDownload(buildingId, floorNum);
 
-		return ResponseEntity.ok().body(floor);
+		return ResponseEntity.ok().body(modelResponse);
+	}
+
+	@GetMapping("guest/{buildingId}/name")
+	public ResponseEntity<?> buildingName(@PathVariable("buildingId") int buildingId) {
+		String buildingName = fileService.buildingName(buildingId);
+		return ResponseEntity.ok().body(buildingName);
 	}
 
 

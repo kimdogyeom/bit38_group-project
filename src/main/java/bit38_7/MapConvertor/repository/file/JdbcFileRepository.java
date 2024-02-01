@@ -2,6 +2,7 @@ package bit38_7.MapConvertor.repository.file;
 
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
+import bit38_7.MapConvertor.dto.ModelResponse;
 import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
@@ -26,8 +27,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-
-	public int saveBuilding(Long userId, String buildingName, byte[] buildingFacade, int buildingCount) {
+	public int saveBuilding(int userId, String buildingName, byte[] buildingFacade, int buildingCount) {
 		String sql = "insert into building_table(fk_user_id, building_name, building_facade, building_floor) values(:userId, :buildingName, :buildingFacade, :buildingCount)";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
@@ -48,13 +48,14 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void saveFloor(int buildingId, int floorNum, byte[] floorData) {
+	public void saveFloor(int buildingId, int floorNum, byte[] floorData, byte[] jsonData) {
 		String sql = "insert into floor_table(building_id, floor_num, floor_file_data, update_date) values(:buildingId, :floorNum, :floorData, CURRENT_DATE())";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("buildingId", buildingId);
 			params.addValue("floorNum", floorNum);
 			params.addValue("floorData", floorData);
+//			params.addValue("jsonData", jsonData);
 
 			template.update(sql, params);
 		} catch (DataAccessException e) {
@@ -65,7 +66,7 @@ public class JdbcFileRepository implements FileRepository {
 
 
 	@Override
-	public List<BuildingResponse> userBuildingList(Long userId) {
+	public List<BuildingResponse> userBuildingList(int userId) {
 		String sql = "select building_id, building_name, building_floor from building_table where fk_user_id = :userId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
@@ -107,14 +108,14 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public byte[] findFloorFile(int buildingId, int floorNum) {
-		String sql = "select floor_file_data from floor_table where building_id = :buildingId and floor_num = :floorNum";
+	public ModelResponse findFloorFile(int buildingId, int floorNum) {
+		String sql = "select floor_file_data, floor_metadata from floor_table where building_id = :buildingId and floor_num = :floorNum";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("buildingId", buildingId);
 			params.addValue("floorNum", floorNum);
 
-			return template.queryForObject(sql, params, byte[].class);
+			return template.queryForObject(sql, params, floorResponseRowMapper());
 		} catch (DataAccessException e) {
 			log.info("error = {}", e.getMessage());
 			return null;
@@ -122,7 +123,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
-	public void updateFloor(int buildingId,int floorNum, byte[] floorData) {
+	public void updateFloor(int buildingId,int floorNum, byte[] floorData, byte[] jsonData) {
 		String sql = "update floor_table set floor_file_data =:floorData where floor_num = :floorNum and building_id = :buildingId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
@@ -190,8 +191,19 @@ public class JdbcFileRepository implements FileRepository {
 		}
 	}
 
+	@Override
+	public String findBuildingName(int buildingId) {
+		String sql = "select building_name from building_table where building_id = :buildingId";
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("buildingId", buildingId);
 
-
+			return template.queryForObject(sql, params, String.class);
+		} catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+			return null;
+		}
+	}
 
 	private RowMapper<FloorInfo> floorRowMapper() {
 		return (rs, rowNum) -> {
@@ -208,6 +220,10 @@ public class JdbcFileRepository implements FileRepository {
 
 	private RowMapper<BuildingResponse> buildingRowMapper() {
 		return BeanPropertyRowMapper.newInstance(BuildingResponse.class);
+	}
+
+	private RowMapper<ModelResponse> floorResponseRowMapper() {
+		return BeanPropertyRowMapper.newInstance(ModelResponse.class);
 	}
 }
 
