@@ -3,6 +3,7 @@ package bit38_7.MapConvertor.service;
 import bit38_7.MapConvertor.dto.BuildingInfo;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
+import bit38_7.MapConvertor.dto.ModelResponse;
 import bit38_7.MapConvertor.repository.file.JdbcFileRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class FileService {
 	 * @param fileData 건물사진
 	 * @return 건물아이디
 	 */
-	public int buildingSave(Long userId,BuildingInfo buildingInfo, byte[] fileData) {
+	public int buildingSave(int userId,BuildingInfo buildingInfo, byte[] fileData) {
 		return jdbcFileRepository.saveBuilding(userId, buildingInfo.getBuildingName(), fileData, buildingInfo.getBuildingCount());
 	}
 
@@ -35,17 +36,17 @@ public class FileService {
 	 * @param floorNum 층번호
 	 * @param floorData 층데이터
 	 */
-	public void floorSave(int buildingId,int floorNum ,byte[] floorData) {
-		jdbcFileRepository.saveFloor(buildingId, floorNum, floorData);
+	public void floorSave(int buildingId,int floorNum ,byte[] floorData, byte[]jsonData) {
+		jdbcFileRepository.saveFloor(buildingId, floorNum, floorData, jsonData);
 	}
 
-	/*
+	/**
 	 * 층 정보 수정
 	 * @param floorNum 층 번호
 	 * @param floorData 층 데이터
 	 */
-	public void floorUpdate(int buildingId, int floorNum, byte[] floorData) {
-		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
+	public void floorUpdate(int buildingId, int floorNum, byte[] floorData, byte[] jsonData) {
+		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData, jsonData);
 	}
 
 
@@ -58,12 +59,12 @@ public class FileService {
 	 * 건물 리스트 조회
 	 * @param userId 유저아이디
 	 */
-	public List<BuildingResponse> buildingList(Long userId) {
+	public List<BuildingResponse> buildingList(int userId) {
 		return jdbcFileRepository.userBuildingList(userId);
 	}
 
 	/**
-	 * 건물 사진 조회
+	 * 건물 모델 다운로드
 	 * @param buildingId 건물아이디
 	 */
 	public byte[] buildingDownload(int buildingId) {
@@ -74,14 +75,13 @@ public class FileService {
 		return jdbcFileRepository.findFloorList(buildingId);
 	}
 
-	public byte[] floorDownload(int buildingId, int floorNum) {
+	public ModelResponse floorDownload(int buildingId, int floorNum) {
 		return jdbcFileRepository.findFloorFile(buildingId, floorNum);
 	}
 
-	public void addPartFloor(int buildingId, int floorNum, byte[] floorData) {
-		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
+	public void addPartFloor(int buildingId, int floorNum, byte[] floorData, byte[] jsonData) {
+		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData, jsonData);
 	}
-
 
 	@Transactional
 	public void buildingDelete(int buildingId) {

@@ -5,6 +5,7 @@ import bit38_7.MapConvertor.dto.BuildingInfo;
 import bit38_7.MapConvertor.dto.BuildingRenderResponse;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
+import bit38_7.MapConvertor.dto.ModelResponse;
 import bit38_7.MapConvertor.dto.floorRenderResponse;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
@@ -14,7 +15,6 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -41,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileController {
 
+	public static final String RENDER_SERVER = "http://10.101.69.52:7050/model";	// 렌더링 서버주소
 	private final FileService fileService;
 
 	@PostMapping("file")
@@ -50,9 +51,9 @@ public class FileController {
 									HttpServletRequest request) throws IOException {
 
 		BuildingInfo buildingInfo = new BuildingInfo(buildingName, floorCount);
-		Long userId = getUserId(request);
+		int userId = getUserId(request);
 
-		String url = "http://10.101.68.13:7080/model";
+		String url = RENDER_SERVER;
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		for (MultipartFile floor : floors) {
@@ -70,16 +71,23 @@ public class FileController {
 		ResponseEntity<BuildingRenderResponse> response = getBuildingRenderResponse(url, entity);
 		BuildingRenderResponse responseBody = response.getBody();
 
-
 		int buildingId = fileService.buildingSave(userId, buildingInfo,
 			getDecodeByte(responseBody.getBuildingData()));
 
-		Map<Integer, String> floorDataMap = responseBody.getFloorData();
 
-		for (Map.Entry<Integer, String> entry : floorDataMap.entrySet()) {
-			Integer floorNum = entry.getKey();
-			String floorData = entry.getValue();
-			fileService.floorSave(buildingId, floorNum, getDecodeByte(floorData));
+		Map<Integer, String> floorDataMap = responseBody.getFloorData();
+		Map<Integer, String> floorJsonData = responseBody.getMetaData();
+		int floorNum = 1;
+
+		for(Integer floorKey : floorDataMap.keySet()) {
+			fileService.floorSave(buildingId, floorNum++,
+				getDecodeByte(floorDataMap.get(floorKey)),
+				getDecodeByte(floorJsonData.get(floorKey)));
+
+
+			// TODO 건물파일 생성 후 잘 받는지 로그찍어본 것 확인 후 지우기
+			log.info("floorDataMap.get(floorKey) = {}", floorDataMap.get(floorKey));
+			log.info("floorJsonData.get(floorKey) = {}", floorJsonData.get(floorKey));
 		}
 
 		return ResponseEntity.ok().body("저장 성공");
@@ -91,7 +99,7 @@ public class FileController {
 											@PathVariable("floorNum") int floorNum,
 											@RequestParam("updateFile") MultipartFile updateFile) throws IOException {
 
-		String url = "http://10.101.68.13:7080/model/addPartial";
+		String url = RENDER_SERVER + "/addPartial";
 
 		MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
 		ByteArrayResource resource = new ByteArrayResource(updateFile.getBytes()) {
@@ -115,8 +123,9 @@ public class FileController {
 			floorRenderResponse.class
 		);
 		byte[] floorBytes = getDecodeByte(response.getBody().getFloorData());
+		byte[] floorJsonBytes = getDecodeByte(response.getBody().getMetaData());
 
-		fileService.addPartFloor(buildingId, floorNum, floorBytes);
+		fileService.addPartFloor(buildingId, floorNum, floorBytes, floorJsonBytes);
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
@@ -124,13 +133,14 @@ public class FileController {
 
 
 	/**
-	 * 건물 리스트 조회
+	 * 유저의 건물 리스트 조회
 	 * @return 유저가 생성한 건물 리스트
 	 */
 	@GetMapping("file/list")
 	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
 
-		Long userId = getUserId(request);
+		int userId = getUserId(request);
+		log.info("userId = {}", userId);
 
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
 		log.info("buildingList = {}", buildingList);
@@ -139,7 +149,7 @@ public class FileController {
 	}
 
 	/**
-	 *  건물정보 조회
+	 * 건물의 층 리스트 조회
 	 * @param buildingId
 	 * @return 층 리스트
 	 */
@@ -154,7 +164,7 @@ public class FileController {
 
 
 	/**
-	 * 건물 선택시 파일 다운로드
+	 * 건물 선택시 건물모델 다운로드
 	 * @return 건물 모델파일
 	 */
 	@GetMapping("file/{buildingId}")
@@ -173,29 +183,32 @@ public class FileController {
 	public ResponseEntity<?> floorDownload(@PathVariable("buildingId") int buildingId,
 											@PathVariable("floorNum") int floorNum) {
 
-		byte[] floor = fileService.floorDownload(buildingId, floorNum);
+		//TODO 층 모델만 보내주고있는데 이거 메타데이터도 같이 보내줘야함
+		// 완료!!
 
-		return ResponseEntity.ok().body(floor);
+		ModelResponse modelResponse = fileService.floorDownload(buildingId, floorNum);
+
+		return ResponseEntity.ok().body(modelResponse);
 	}
 
+	/**
+	 * 층 정보 수정
+	 * @param buildingId
+	 * @param floorNum
+	 * @param updateFile
+	 * @param updateMetaData
+	 */
 	@PutMapping("file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId,
 										@PathVariable("floorNum")int floorNum,
-										@RequestPart("updateFile")MultipartFile updateFile) throws IOException {
+										@RequestPart("updateFile")MultipartFile updateFile,
+										@RequestParam("updateMetaData")byte[] updateMetaData) throws IOException {
 
     byte[] floorData = updateFile.getBytes();
 
-		fileService.floorUpdate(buildingId,floorNum,floorData);
+	fileService.floorUpdate(buildingId,floorNum,floorData, updateMetaData);
 
 		return ResponseEntity.ok().body("수정 성공");
-	}
-
-	@DeleteMapping("file/{buildingId}/{floorNum}")
-	public ResponseEntity<?> deleteFloor(@PathVariable("buildingId")int buildingId,
-											@PathVariable("floorNum")int floorNum) {
-
-		fileService.floorDelete(buildingId,floorNum);
-		return ResponseEntity.ok().body("삭제 성공");
 	}
 
 	@DeleteMapping("file/{buildingId}")
@@ -206,14 +219,32 @@ public class FileController {
 	}
 
 
+	/**
+	 * 층 삭제
+	 * @param buildingId
+	 * @param floorNum
+	 */
+	@DeleteMapping("file/{buildingId}/{floorNum}")
+	public ResponseEntity<?> deleteFloor(@PathVariable("buildingId")int buildingId,
+										 @PathVariable("floorNum")int floorNum) {
+
+		fileService.floorDelete(buildingId,floorNum);
+		return ResponseEntity.ok().body("삭제 성공");
+	}
+
+
+
+
+
+
 	private static byte[] getDecodeByte(String encodingData) {
 		return Base64.getDecoder().decode(encodingData);
 	}
 
-	private static Long getUserId(HttpServletRequest request) {
+	private static int getUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
-		return user.getUserId();
+		return user.getUserId().intValue();
 	}
 
 	private static ResponseEntity<BuildingRenderResponse> getBuildingRenderResponse(
