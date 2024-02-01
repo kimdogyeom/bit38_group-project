@@ -109,7 +109,7 @@ public class JdbcFileRepository implements FileRepository {
 
 	@Override
 	public ModelResponse findFloorFile(int buildingId, int floorNum) {
-		String sql = "select floor_file_data, floor_metadata from floor_table where building_id = :buildingId and floor_num = :floorNum";
+		String sql = "select floor_file_data, meta_data from floor_table where building_id = :buildingId and floor_num = :floorNum";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("buildingId", buildingId);

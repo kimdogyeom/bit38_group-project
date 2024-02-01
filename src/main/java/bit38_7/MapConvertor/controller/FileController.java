@@ -41,7 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileController {
 
-	public static final String RENDER_SERVER = "http://10.101.69.52:7050/model";	// 렌더링 서버주소
+	public static final String RENDER_SERVER = "http://10.101.68.13:7080/model";	// 렌더링 서버주소
 	private final FileService fileService;
 
 	@PostMapping("file")
@@ -71,16 +71,14 @@ public class FileController {
 		ResponseEntity<BuildingRenderResponse> response = getBuildingRenderResponse(url, entity);
 		BuildingRenderResponse responseBody = response.getBody();
 
-		int buildingId = fileService.buildingSave(userId, buildingInfo,
-			getDecodeByte(responseBody.getBuildingData()));
+		int buildingId = fileService.buildingSave(userId, buildingInfo, getDecodeByte(responseBody.getBuildingData()));
 
 
 		Map<Integer, String> floorDataMap = responseBody.getFloorData();
 		Map<Integer, String> floorJsonData = responseBody.getMetaData();
-		int floorNum = 1;
 
 		for(Integer floorKey : floorDataMap.keySet()) {
-			fileService.floorSave(buildingId, floorNum++,
+			fileService.floorSave(buildingId, floorKey,
 				getDecodeByte(floorDataMap.get(floorKey)),
 				getDecodeByte(floorJsonData.get(floorKey)));
 
@@ -123,9 +121,9 @@ public class FileController {
 			floorRenderResponse.class
 		);
 		byte[] floorBytes = getDecodeByte(response.getBody().getFloorData());
-		byte[] floorJsonBytes = getDecodeByte(response.getBody().getMetaData());
+		byte[] floorMetaBytes = getDecodeByte(response.getBody().getMetaData());
 
-		fileService.addPartFloor(buildingId, floorNum, floorBytes, floorJsonBytes);
+		fileService.addPartFloor(buildingId, floorNum, floorBytes, floorMetaBytes);
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
@@ -182,9 +180,6 @@ public class FileController {
 	@GetMapping("file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> floorDownload(@PathVariable("buildingId") int buildingId,
 											@PathVariable("floorNum") int floorNum) {
-
-		//TODO 층 모델만 보내주고있는데 이거 메타데이터도 같이 보내줘야함
-		// 완료!!
 
 		ModelResponse modelResponse = fileService.floorDownload(buildingId, floorNum);
 

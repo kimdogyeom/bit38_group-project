@@ -51,4 +51,17 @@ class JdbcFileRepositoryTest {
 		return BeanPropertyRowMapper.newInstance(BuildingResponse.class);
 	}
 
+	@Test
+	void deletebuilding(int buildingId) {
+		String sql = "delete from building_table where building_id = :buildingId";
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("buildingId", buildingId);
+
+			template.update(sql, params);
+		} catch (DataAccessException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
 }
