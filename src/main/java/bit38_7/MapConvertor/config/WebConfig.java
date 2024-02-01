@@ -52,12 +52,12 @@ public class WebConfig implements WebMvcConfigurer{
 		registry.addInterceptor(new LoginCheckInterceptor())
 			.order(2)
 			.addPathPatterns("/**")
-			.excludePathPatterns("/v3/api-docs/**", "/swagger-ui/**", "/users/**", "/join", "/login", "/logout", "/error", "/*.ico", "/error");
+			.excludePathPatterns("/guest/**", "/v3/api-docs/**", "/swagger-ui/**", "/users/**", "/join", "/login", "/logout", "/error", "/*.ico", "/error");
 
 		registry.addInterceptor(new BuildingCheckInterceptor(jdbcFileRepository))
 			.order(3)
 			.addPathPatterns("/file/{buildingId}/**")
-			.excludePathPatterns("/file/list","/v3/api-docs/**", "/swagger-ui/**", "/users/**", "/join", "/login", "/logout", "/error", "/*.ico", "/error");
+			.excludePathPatterns("/guest/**", "/file/list","/v3/api-docs/**", "/swagger-ui/**", "/users/**", "/join", "/login", "/logout", "/error", "/*.ico", "/error");
 	}
 
 }

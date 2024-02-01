@@ -70,6 +70,7 @@ public class FileController {
 		ResponseEntity<BuildingRenderResponse> response = getBuildingRenderResponse(url, entity);
 		BuildingRenderResponse responseBody = response.getBody();
 
+
 		int buildingId = fileService.buildingSave(userId, buildingInfo,
 			getDecodeByte(responseBody.getBuildingData()));
 
@@ -196,8 +197,13 @@ public class FileController {
 		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
-  
-  
+
+	@DeleteMapping("file/{buildingId}")
+	public ResponseEntity<?> deleteBuilding(@PathVariable("buildingId")int buildingId) {
+
+		fileService.buildingDelete(buildingId);
+		return ResponseEntity.ok().body("삭제 성공");
+	}
 
 
 	private static byte[] getDecodeByte(String encodingData) {

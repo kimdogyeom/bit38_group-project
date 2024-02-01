@@ -82,9 +82,14 @@ public class FileService {
 		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData);
 	}
 
+
 	@Transactional
 	public void buildingDelete(int buildingId) {
 		jdbcFileRepository.deleteFloorAll(buildingId);
 		jdbcFileRepository.deleteBuilding(buildingId);
+	}
+
+	public String buildingName(int buildingId) {
+		return jdbcFileRepository.findBuildingName(buildingId);
 	}
 }

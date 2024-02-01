@@ -58,7 +58,11 @@ public class GuestController {
 		return ResponseEntity.ok().body(floor);
 	}
 
-
+	@GetMapping("guest/{buildingId}/name")
+	public ResponseEntity<?> buildingName(@PathVariable("buildingId") int buildingId) {
+		String buildingName = fileService.buildingName(buildingId);
+		return ResponseEntity.ok().body(buildingName);
+	}
 
 }
 

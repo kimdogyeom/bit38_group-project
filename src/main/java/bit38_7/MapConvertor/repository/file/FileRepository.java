@@ -29,4 +29,5 @@ public interface FileRepository {
 
 	void deleteFloorAll(int buildingId);
 
+	String findBuildingName(int buildingId);
 }

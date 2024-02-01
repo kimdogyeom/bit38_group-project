@@ -190,6 +190,19 @@ public class JdbcFileRepository implements FileRepository {
 		}
 	}
 
+	@Override
+	public String findBuildingName(int buildingId) {
+		String sql = "select building_name from building_table where building_id = :buildingId";
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("buildingId", buildingId);
+
+			return template.queryForObject(sql, params, String.class);
+		} catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+			return null;
+		}
+	}
 
 
 
