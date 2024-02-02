@@ -20,7 +20,7 @@ public interface FileRepository {
 
 	ModelResponse findFloorFile(int buildingId, int floorNum);
 
-	void updateFloor(int buildingId,int floorNum, byte[] floorData, byte[] jsonData);
+	void updateFloor(int buildingId,int floorNum, byte[] jsonData);
 
 	void deleteFloor(int buildingId,int floorNum);
 

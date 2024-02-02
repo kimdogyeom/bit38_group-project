@@ -41,7 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileController {
 
-	public static final String RENDER_SERVER = "http://10.101.68.13:7080/model";	// 렌더링 서버주소
+	public static final String RENDER_SERVER = "http://10.101.69.52:7050/model";	// 렌더링 서버주소
 	private final FileService fileService;
 
 	@PostMapping("file")
@@ -174,18 +174,14 @@ public class FileController {
 	 * 층 정보 수정
 	 * @param buildingId
 	 * @param floorNum
-	 * @param updateFile
 	 * @param updateMetaData
 	 */
 	@PutMapping("file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId,
 										@PathVariable("floorNum")int floorNum,
-										@RequestPart("updateFile")MultipartFile updateFile,
-										@RequestParam("updateMetaData")byte[] updateMetaData) throws IOException {
+										@RequestParam("updateMetaData")byte[] updateMetaData) {
 
-    byte[] floorData = updateFile.getBytes();
-
-	fileService.floorUpdate(buildingId,floorNum,floorData, updateMetaData);
+		fileService.floorUpdate(buildingId, floorNum, updateMetaData);
 
 		return ResponseEntity.ok().body("수정 성공");
 	}

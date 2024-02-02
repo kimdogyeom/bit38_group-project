@@ -123,12 +123,11 @@ public class JdbcFileRepository implements FileRepository {
 	}
 //
 	@Override
-	public void updateFloor(int buildingId,int floorNum, byte[] floorData, byte[] metaData) {
-		String sql = "update floor_table set floor_file_data =:floorData, meta_data =:metaData  where floor_num = :floorNum and building_id = :buildingId";
+	public void updateFloor(int buildingId,int floorNum, byte[] metaData) {
+		String sql = "update floor_table set meta_data =:metaData  where floor_num = :floorNum and building_id = :buildingId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
 			params.addValue("buildingId", buildingId);
-			params.addValue("floorData", floorData);
 			params.addValue("floorNum", floorNum);
 			params.addValue("metaData", metaData);
 

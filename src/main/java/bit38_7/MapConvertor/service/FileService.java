@@ -44,10 +44,9 @@ public class FileService {
 	/**
 	 * 층 정보 수정
 	 * @param floorNum 층 번호
-	 * @param floorData 층 데이터
 	 */
-	public void floorUpdate(int buildingId, int floorNum, byte[] floorData, byte[] jsonData) {
-		jdbcFileRepository.updateFloor(buildingId, floorNum, floorData, jsonData);
+	public void floorUpdate(int buildingId, int floorNum, byte[] jsonData) {
+		jdbcFileRepository.updateFloor(buildingId, floorNum, jsonData);
 	}
 
 
@@ -86,7 +85,7 @@ public class FileService {
        		byte[] floorMetaBytes = getDecodeByte(response.getMetaData());
 
 
-		jdbcFileRepository.updateFloor(buildingId, floorNum, floorBytes, floorMetaBytes);
+//		jdbcFileRepository.updateFloor(buildingId, floorNum, floorBytes, floorMetaBytes);
 	}
 
 	@Transactional
