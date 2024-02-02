@@ -30,14 +30,10 @@ public class JdbcUserRepository implements UserRepository {
 	}
 
 	@Override
-	public User save(User user) {
+	public User join(User user) {
 		String sql = "insert into users(login_id, user_name, password, email) values(:loginId, :userName, :password, :email)";
 
 		try {
-//			String result = checkId(user.getLoginId());
-//			if (result == null) {
-//				return null;
-//			}
 
 			SqlParameterSource param = new BeanPropertySqlParameterSource(user);
 

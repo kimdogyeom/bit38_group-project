@@ -28,6 +28,9 @@ public class LoginController {
 
 	private final UserService userService;
 
+	/**
+	 * 로그인
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> login(HttpServletRequest request, @RequestBody LoginRequest loginRequest)
 	{
@@ -56,7 +59,9 @@ public class LoginController {
 		return ResponseEntity.ok().body("로그인 성공");
 	}
 
-
+	/**
+	 * 로그아웃
+	 * */
 	@PostMapping("/logout")
 	public ResponseEntity<?> logout(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
@@ -70,7 +75,9 @@ public class LoginController {
 	}
 
 
-
+	/**
+	 *회원가입
+	 */
 	@PostMapping("/join")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult bindingResult) {
 

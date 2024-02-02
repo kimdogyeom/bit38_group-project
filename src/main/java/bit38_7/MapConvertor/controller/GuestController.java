@@ -19,7 +19,7 @@ public class GuestController {
 	private final FileService fileService;
 
 	/**
-	 *  건물정보 조회
+	 * 건물정보 조회
 	 * @param buildingId
 	 * @return 층 리스트
 	 */
@@ -59,6 +59,10 @@ public class GuestController {
 		return ResponseEntity.ok().body(modelResponse);
 	}
 
+	/**
+	 * 빌딩 아이디 선택시 해당 건물 이름
+	 * @return 빌딩 이름
+	 */
 	@GetMapping("guest/{buildingId}/name")
 	public ResponseEntity<?> buildingName(@PathVariable("buildingId") int buildingId) {
 		String buildingName = fileService.buildingName(buildingId);

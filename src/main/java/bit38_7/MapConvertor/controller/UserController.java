@@ -30,7 +30,6 @@ public class UserController {
 	 * 유저 정보 조회
 	 * @return loginId, userName
 	 */
-
 	@GetMapping("/users/info")
 	public ResponseEntity<?> userInfo(HttpServletRequest request) {
 

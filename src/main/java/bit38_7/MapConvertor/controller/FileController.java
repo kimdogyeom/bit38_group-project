@@ -44,6 +44,11 @@ public class FileController {
 	public static final String RENDER_SERVER = "http://10.101.69.52:7050/model";	// 렌더링 서버주소
 	private final FileService fileService;
 
+
+	/**
+	* 유저의 건물 저장 & 층 데이터 저장
+	*  건물 저장이 성공 하면 -> 서비스 내 에서 층도 저장
+	*/
 	@PostMapping("file")
 	public ResponseEntity<?> fileSave(@RequestParam("buildingName") String buildingName,
 									@RequestParam("floorCount") int floorCount,
@@ -71,6 +76,8 @@ public class FileController {
 		ResponseEntity<BuildingRenderResponse> response = getBuildingRenderResponse(url, entity);
 		BuildingRenderResponse responseBody = response.getBody();
 
+
+		//건물 저장
 		fileService.fileSave(userId, buildingInfo,responseBody);
 
 
@@ -146,7 +153,7 @@ public class FileController {
 
 
 	/**
-	 * 건물 선택시 건물모델 다운로드
+	 * 건물 선택시 건물 모델 다운로드
 	 * @return 건물 모델파일
 	 */
 	@GetMapping("file/{buildingId}")
@@ -186,6 +193,10 @@ public class FileController {
 		return ResponseEntity.ok().body("수정 성공");
 	}
 
+	/**
+	 *건물 삭제 및 층 데이터 삭제
+	 * @param buildingId
+	 */
 	@DeleteMapping("file/{buildingId}")
 	public ResponseEntity<?> deleteBuilding(@PathVariable("buildingId")int buildingId) {
 
@@ -206,6 +217,8 @@ public class FileController {
 		fileService.floorDelete(buildingId,floorNum);
 		return ResponseEntity.ok().body("삭제 성공");
 	}
+
+
 
 	private static int getUserId(HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
