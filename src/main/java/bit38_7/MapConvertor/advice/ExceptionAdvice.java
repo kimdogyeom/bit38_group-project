@@ -56,13 +56,4 @@ public class ExceptionAdvice {
     public Response memberNotEqualsException() {
         return Response.failure(401, "유저 정보가 일치하지 않습니다.");
     }
-
-    // 401 응답
-    // 로그인한 유저의 세션이 존재 하지 않습니다.
-    @ExceptionHandler(MemberNotEqualsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Response SessionNotFountException() {
-        return Response.failure(401, "유저의 세션이 없습니다.");
-    }
-
 }

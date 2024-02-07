@@ -5,7 +5,6 @@ import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.InfoRequest;
 import bit38_7.MapConvertor.dto.UserRequest;
 import bit38_7.MapConvertor.exception.ControllerException.MemberNotFoundException;
-import bit38_7.MapConvertor.exception.ControllerException.SessionNotFountException;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,9 +37,6 @@ public class UserController {
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-		if (user == null) {
-			throw new SessionNotFountException();
-		}
 		InfoRequest responseUser = new InfoRequest();
 
 		responseUser.setLoginId(user.getLoginId());
@@ -110,9 +106,7 @@ public class UserController {
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-		if (user == null) {
-			throw new SessionNotFountException();
-		}
+
 
 		return ResponseEntity.ok().body(user.getUserId());
 	}
