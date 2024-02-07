@@ -39,9 +39,9 @@ public class FileService {
 					getDecodeByte(floorDataMap.get(floorKey)),
 					getDecodeByte(floorMetaData.get(floorKey)));
 
-			// TODO 건물파일 생성 후 잘 받는지 로그찍어본 것 확인 후 지우기
-			log.info("floorDataMap.get(floorKey) = {}", floorDataMap.get(floorKey));
-			log.info("floorMetaData.get(floorKey) = {}", floorMetaData.get(floorKey));
+//			 TODO 건물파일 생성 후 잘 받는지 로그찍어본 것 확인 후 지우기
+//			log.info("floorDataMap.get(floorKey) = {}", floorDataMap.get(floorKey));
+//			log.info("floorMetaData.get(floorKey) = {}", floorMetaData.get(floorKey));
 		}
 
 	}
@@ -74,6 +74,7 @@ public class FileService {
 		return jdbcFileRepository.userBuildingList(userId);
 	}
 
+
 	/**
 	 * 건물 모델 다운로드
 	 * @param buildingId 건물아이디
@@ -82,6 +83,7 @@ public class FileService {
 		return jdbcFileRepository.findBuildingFile(buildingId);
 	}
 
+
 	/**
 	 * 층 리스트 조회
 	 * @param buildingId 빌딩 아이디
@@ -89,6 +91,7 @@ public class FileService {
 	public List<FloorInfo> floorList(int buildingId) {
 		return jdbcFileRepository.findFloorList(buildingId);
 	}
+
 
 	/**
 	 * 층 데이터 다운로드
@@ -99,11 +102,11 @@ public class FileService {
 		return jdbcFileRepository.findFloorFile(buildingId, floorNum);
 	}
 
+
 	public void addPartFloor(int buildingId, int floorNum,floorRenderResponse response) {
 
 		    byte[] floorBytes = getDecodeByte(response.getFloorData());
        		byte[] floorMetaBytes = getDecodeByte(response.getMetaData());
-
 
 //		jdbcFileRepository.updateFloor(buildingId, floorNum, floorBytes, floorMetaBytes);
 	}

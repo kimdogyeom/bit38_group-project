@@ -47,7 +47,7 @@ public class FileController {
 
 
 	/**
-	* 유저의 건물 저장 & 층 데이터 저장
+	* 유저의 건물 저장 & 층 a데이터 저장
 	*  건물 저장이 성공 하면 -> 서비스 내 에서 층도 저장
 	*/
 	@PostMapping("file")
