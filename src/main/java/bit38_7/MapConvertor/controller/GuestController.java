@@ -2,6 +2,8 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.dto.ModelResponse;
+import bit38_7.MapConvertor.exception.ControllerException.FileUploadFailureException;
+import bit38_7.MapConvertor.exception.ControllerException.MemberNotEqualsException;
 import bit38_7.MapConvertor.service.FileService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,9 @@ public class GuestController {
 	public ResponseEntity<?> floorList(@PathVariable("buildingId") int buildingId) {
 
 		List<FloorInfo> floorList = fileService.floorList(buildingId);
+		if (floorList == null) {
+			throw new MemberNotEqualsException();
+		}
 		log.info("floorList = {}", floorList);
 
 		return ResponseEntity.ok().body(floorList);
@@ -41,6 +46,9 @@ public class GuestController {
 	public ResponseEntity<?> buildingDownload(@PathVariable("buildingId") int buildingId) {
 
 		byte[] buildingData = fileService.buildingDownload(buildingId);
+		if (buildingData == null) {
+			throw new FileUploadFailureException();
+		}
 
 		return ResponseEntity.ok().body(buildingData);
 	}
@@ -56,12 +64,21 @@ public class GuestController {
 
 		ModelResponse modelResponse = fileService.floorDownload(buildingId, floorNum);
 
+		if (modelResponse == null) {
+			throw new FileUploadFailureException();
+		}
+
 		return ResponseEntity.ok().body(modelResponse);
 	}
 
 	@GetMapping("guest/{buildingId}/name")
 	public ResponseEntity<?> buildingName(@PathVariable("buildingId") int buildingId) {
 		String buildingName = fileService.buildingName(buildingId);
+
+		if (buildingName == null) {
+			throw new MemberNotEqualsException();
+		}
+
 		return ResponseEntity.ok().body(buildingName);
 	}
 

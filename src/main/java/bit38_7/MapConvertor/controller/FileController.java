@@ -7,14 +7,15 @@ import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.dto.ModelResponse;
 import bit38_7.MapConvertor.dto.floorRenderResponse;
+import bit38_7.MapConvertor.exception.ControllerException.FileUploadFailureException;
+import bit38_7.MapConvertor.exception.ControllerException.MemberNotEqualsException;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
-import java.util.Map;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
@@ -125,6 +126,9 @@ public class FileController {
 		log.info("userId = {}", userId);
 
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
+		if (buildingList == null) {
+			throw new MemberNotEqualsException();
+		}
 		log.info("buildingList = {}", buildingList);
 
 		return ResponseEntity.ok().body(buildingList);
@@ -139,6 +143,9 @@ public class FileController {
 	public ResponseEntity<?> floorList(@PathVariable("buildingId") int buildingId) {
 
 		List<FloorInfo> floorList = fileService.floorList(buildingId);
+		if (floorList == null) {
+			throw new MemberNotEqualsException();
+		}
 		log.info("floorList = {}", floorList);
 
 		return ResponseEntity.ok().body(floorList);
@@ -154,6 +161,10 @@ public class FileController {
 
 		byte[] buildingData = fileService.buildingDownload(buildingId);
 
+		if (buildingData == null) {
+			throw new FileUploadFailureException();
+		}
+
 		return ResponseEntity.ok().body(buildingData);
 	}
 
@@ -166,6 +177,9 @@ public class FileController {
 											@PathVariable("floorNum") int floorNum) {
 
 		ModelResponse modelResponse = fileService.floorDownload(buildingId, floorNum);
+		if (modelResponse == null) {
+			throw new FileUploadFailureException();
+		}
 
 		return ResponseEntity.ok().body(modelResponse);
 	}
@@ -186,6 +200,10 @@ public class FileController {
 		return ResponseEntity.ok().body("수정 성공");
 	}
 
+	/**
+	 * 건물, 층 데이터 전체 삭제
+	 * buildingId
+	 * */
 	@DeleteMapping("file/{buildingId}")
 	public ResponseEntity<?> deleteBuilding(@PathVariable("buildingId")int buildingId) {
 

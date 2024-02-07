@@ -1,8 +1,10 @@
 package bit38_7.MapConvertor.advice;
 
 
-import bit38_7.MapConvertor.exception.LoginFailureException;
-import bit38_7.MapConvertor.exception.MemberNotFoundException;
+import bit38_7.MapConvertor.exception.ControllerException.FileUploadFailureException;
+import bit38_7.MapConvertor.exception.ControllerException.LoginFailureException;
+import bit38_7.MapConvertor.exception.ControllerException.MemberNotEqualsException;
+import bit38_7.MapConvertor.exception.ControllerException.MemberNotFoundException;
 import bit38_7.MapConvertor.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,31 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response memberNotFoundException() {
         return Response.failure(404, "요청한 회원을 찾을 수 없습니다.");
+    }
+
+    // 404 응답
+    // 파일 업로드 실패
+    @ExceptionHandler(FileUploadFailureException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response fileUploadFailureException(FileUploadFailureException e) {
+        log.error("e = {}", e.getMessage());
+        return Response.failure(404, "파일 업로드 실패");
+    }
+
+    // 401 응답
+    // 요청자와 요청한 유저의 정보가 일치하지 않을시에 발생
+    @ExceptionHandler(MemberNotEqualsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response memberNotEqualsException() {
+        return Response.failure(401, "유저 정보가 일치하지 않습니다.");
+    }
+
+    // 401 응답
+    // 로그인한 유저의 세션이 존재 하지 않습니다.
+    @ExceptionHandler(MemberNotEqualsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Response SessionNotFountException() {
+        return Response.failure(401, "유저의 세션이 없습니다.");
     }
 
 }

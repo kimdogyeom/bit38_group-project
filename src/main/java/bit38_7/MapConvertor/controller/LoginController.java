@@ -2,7 +2,7 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.domain.user.User;
 import bit38_7.MapConvertor.dto.LoginRequest;
-import bit38_7.MapConvertor.exception.LoginFailureException;
+import bit38_7.MapConvertor.exception.ControllerException.LoginFailureException;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
