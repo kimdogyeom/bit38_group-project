@@ -2,6 +2,7 @@ package bit38_7.MapConvertor.controller;
 
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.dto.ModelResponse;
+import bit38_7.MapConvertor.dto.RoomSerchResult;
 import bit38_7.MapConvertor.service.FileService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -67,6 +69,24 @@ public class GuestController {
 	public ResponseEntity<?> buildingName(@PathVariable("buildingId") int buildingId) {
 		String buildingName = fileService.buildingName(buildingId);
 		return ResponseEntity.ok().body(buildingName);
+	}
+
+
+	/**
+	 * 층 안에있는 방 검색
+	 */
+	@GetMapping("guest/{buildingId}/search")
+	public ResponseEntity<?> searchRoom(@PathVariable("buildingId") int buildingId,
+		@RequestParam("roomName") String roomName) {
+
+		log.info("roomName = {}", roomName);
+		RoomSerchResult roomInfo = fileService.searchRoom(buildingId, roomName);
+
+		if(roomInfo == null) {
+			return ResponseEntity.status(404).body("검색 결과가 없습니다.");
+		}
+
+		return ResponseEntity.ok().body(roomInfo);
 	}
 
 }

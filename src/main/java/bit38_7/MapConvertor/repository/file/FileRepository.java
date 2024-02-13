@@ -4,6 +4,7 @@ package bit38_7.MapConvertor.repository.file;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.dto.ModelResponse;
+import bit38_7.MapConvertor.repository.file.dao.FloorMetaInfo;
 import java.util.List;
 
 public interface FileRepository {
@@ -20,7 +21,7 @@ public interface FileRepository {
 
 	ModelResponse findFloorFile(int buildingId, int floorNum);
 
-	void updateFloor(int buildingId,int floorNum, byte[] jsonData);
+	void updateFloor(int buildingId,int floorNum, String jsonData);
 
 	void deleteFloor(int buildingId,int floorNum);
 
@@ -31,4 +32,6 @@ public interface FileRepository {
 	void deleteFloorAll(int buildingId);
 
 	String findBuildingName(int buildingId);
+
+	List<FloorMetaInfo> findFloorMeteData(int buildingId);
 }

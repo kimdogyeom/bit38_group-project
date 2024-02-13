@@ -103,10 +103,14 @@ public class UserController {
 	public ResponseEntity<?> userSession(HttpServletRequest request) {
 
 		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-		if (user == null) {
+		if(session == null) {
 			return ResponseEntity.badRequest().body("세션이 없습니다.");
+		}
+
+		User user = (User) session.getAttribute(SessionConst.LOGIN_MEMBER);
+		if (user == null) {
+			return ResponseEntity.badRequest().body("세션 유저정보가 없습니다.");
 		}
 
 		return ResponseEntity.ok().body(user.getUserId());

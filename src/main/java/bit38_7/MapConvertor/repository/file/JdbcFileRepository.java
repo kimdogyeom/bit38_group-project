@@ -3,6 +3,8 @@ package bit38_7.MapConvertor.repository.file;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.dto.ModelResponse;
+import bit38_7.MapConvertor.dto.RoomSerchDTO;
+import bit38_7.MapConvertor.repository.file.dao.FloorMetaInfo;
 import java.time.LocalDate;
 import java.util.List;
 import javax.sql.DataSource;
@@ -126,6 +128,20 @@ public class JdbcFileRepository implements FileRepository {
 	}
 
 	@Override
+	public List<FloorMetaInfo> findFloorMeteData(int buildingId) {
+		String sql = "select floor_num, meta_data from floor_table where building_id = :buildingId";
+		try {
+			MapSqlParameterSource params = new MapSqlParameterSource();
+			params.addValue("buildingId", buildingId);
+
+			return template.query(sql, params, serchRoomRowMapper());
+		} catch (DataAccessException e) {
+			log.info("error = {}", e.getMessage());
+			return null;
+		}
+	}
+
+	@Override
 	public ModelResponse findFloorFile(int buildingId, int floorNum) {
 		String sql = "select floor_file_data, meta_data from floor_table where building_id = :buildingId and floor_num = :floorNum";
 		try {
@@ -141,7 +157,7 @@ public class JdbcFileRepository implements FileRepository {
 	}
 //
 	@Override
-	public void updateFloor(int buildingId,int floorNum, byte[] metaData) {
+	public void updateFloor(int buildingId,int floorNum, String metaData) {
 		String sql = "update floor_table set meta_data =:metaData  where floor_num = :floorNum and building_id = :buildingId";
 		try {
 			MapSqlParameterSource params = new MapSqlParameterSource();
@@ -209,6 +225,15 @@ public class JdbcFileRepository implements FileRepository {
 			log.info("error = {}", e.getMessage());
 			return null;
 		}
+	}
+
+	private RowMapper<FloorMetaInfo> serchRoomRowMapper() {
+		return (rs, rowNum) -> {
+			FloorMetaInfo floorMetaInfo = new FloorMetaInfo();
+			floorMetaInfo.setFloorNum(rs.getInt("floor_num"));
+			floorMetaInfo.setMetaData(rs.getString("meta_data"));
+			return floorMetaInfo;
+		};
 	}
 
 	private RowMapper<FloorInfo> floorRowMapper() {

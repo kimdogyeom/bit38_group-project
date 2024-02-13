@@ -3,14 +3,18 @@ package bit38_7.MapConvertor.service;
 import bit38_7.MapConvertor.dto.*;
 import bit38_7.MapConvertor.repository.file.JdbcFileRepository;
 
+import bit38_7.MapConvertor.repository.file.dao.FloorMetaInfo;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.json.JSONObject;
 
 
 @Slf4j
@@ -52,7 +56,7 @@ public class FileService {
 	 * @param floorNum 층 번호
 	 * @param jsonData 변경 할 층 데이터
 	 */
-	public void floorUpdate(int buildingId, int floorNum, byte[] jsonData) {
+	public void floorUpdate(int buildingId, int floorNum, String jsonData) {
 		jdbcFileRepository.updateFloor(buildingId, floorNum, jsonData);
 	}
 
@@ -133,4 +137,38 @@ public class FileService {
 		return Base64.getDecoder().decode(encodingData);
 	}
 
+	public RoomSerchResult searchRoom(int buildingId, String roomName){
+		List<FloorMetaInfo> floorMeteData = jdbcFileRepository.findFloorMeteData(buildingId);
+		Map<Integer, String> floorMetaDataMap = new LinkedHashMap<>();
+
+		for (FloorMetaInfo floorMeteDatum : floorMeteData) {
+			floorMetaDataMap.put(floorMeteDatum.getFloorNum(), floorMeteDatum.getMetaData());
+		}
+
+		for (Integer i : floorMetaDataMap.keySet()) {
+			String metaData = floorMetaDataMap.get(i);
+
+			try {
+				JSONObject jsonObject = new JSONObject(metaData);
+
+				// 각 polygon의 roomName 값 출력 및 검색 예시
+				for (int j = 0; j < jsonObject.length(); j++) {
+					JSONObject polygon = jsonObject.getJSONObject("polygon" + j);
+					String roomName2 = polygon.getString("roomName");
+					log.info("polygon{}의 roomName: {}", j, roomName2);
+
+					// 특정 문자열을 포함하는 roomName 검색 예시
+					if (roomName2.contains(roomName)) {
+						log.info("polygon{}의 roomName에 {} 포함됨", j, roomName);
+						// 여기서 층번호하고 polygon 번호를 리턴하면 될듯
+						return new RoomSerchResult(i, ("polygon" + j));
+					}
+				}
+			} catch (JSONException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		return null;
+	}
 }

@@ -6,6 +6,8 @@ import bit38_7.MapConvertor.dto.BuildingRenderResponse;
 import bit38_7.MapConvertor.dto.BuildingResponse;
 import bit38_7.MapConvertor.dto.FloorInfo;
 import bit38_7.MapConvertor.dto.ModelResponse;
+import bit38_7.MapConvertor.dto.RoomSerchDTO;
+import bit38_7.MapConvertor.dto.RoomSerchResult;
 import bit38_7.MapConvertor.dto.floorRenderResponse;
 import bit38_7.MapConvertor.interceptor.session.SessionConst;
 import bit38_7.MapConvertor.service.FileService;
@@ -42,12 +44,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileController {
 
-	public static final String RENDER_SERVER = "http://10.101.69.52:7050/model";	// 렌더링 서버주소
+	public static final String RENDER_SERVER = "http://220.90.179.63:8000/model";	// 렌더링 서버주소
 	private final FileService fileService;
 
 
 	/**
-	* 유저의 건물 저장 & 층 a데이터 저장
+	* 유저의 건물 저장 & 층 데이터 저장
 	*  건물 저장이 성공 하면 -> 서비스 내 에서 층도 저장
 	*/
 	@PostMapping("file")
@@ -130,10 +132,8 @@ public class FileController {
 	public ResponseEntity<?> BuildingList(HttpServletRequest request) {
 
 		int userId = getUserId(request);
-		log.info("userId = {}", userId);
 
 		List<BuildingResponse> buildingList = fileService.buildingList(userId);
-		log.info("buildingList = {}", buildingList);
 
 		return ResponseEntity.ok().body(buildingList);
 	}
@@ -147,7 +147,6 @@ public class FileController {
 	public ResponseEntity<?> floorList(@PathVariable("buildingId") int buildingId) {
 
 		List<FloorInfo> floorList = fileService.floorList(buildingId);
-		log.info("floorList = {}", floorList);
 
 		return ResponseEntity.ok().body(floorList);
 	}
@@ -184,15 +183,18 @@ public class FileController {
 	 * @param floorNum
 	 * @param updateMetaData
 	 */
-	@PutMapping(value = "file/{buildingId}/{floorNum}", consumes = "application/json; charset=UTF-8", produces = "application/json; charset=UTF-8")
+	@PutMapping(value = "file/{buildingId}/{floorNum}")
 	public ResponseEntity<?> updateFloor(@PathVariable("buildingId")int buildingId,
 										@PathVariable("floorNum")int floorNum,
-										@RequestBody byte[] updateMetaData) {
+										@RequestBody String updateMetaData) {
 
+		log.info("updateMetaData = {}", updateMetaData);
 		fileService.floorUpdate(buildingId, floorNum, updateMetaData);
+
 
 		return ResponseEntity.ok().body("수정 성공");
 	}
+
 
 	/**
 	 *건물 삭제 및 층 데이터 삭제
